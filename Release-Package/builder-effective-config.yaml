@@ -1,0 +1,49 @@
+directories:
+  output: dist
+  buildResources: build
+appId: com.dropbook.fleet
+productName: DropBook
+copyright: Copyright © 2026 VERONIC Fleet Management
+files:
+  - filter:
+      - '**/*'
+      - '!apk/**'
+      - '!dist/**'
+asar: true
+asarUnpack:
+  - '**/node_modules/sqlite3/**'
+  - '**/veronic_fleet.db'
+forceCodeSigning: false
+win:
+  target:
+    - nsis
+    - portable
+    - zip
+    - dir
+  icon: icon.ico
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  allowElevation: true
+  createDesktopShortcut: always
+  createStartMenuShortcut: true
+  shortcutName: DropBook
+  uninstallDisplayName: DropBook Fleet & Parcel Management
+  deleteAppDataOnUninstall: false
+  runAfterFinish: true
+  artifactName: DropBook-Setup.${ext}
+portable:
+  artifactName: DropBook-windows.${ext}
+extraResources:
+  - from: apk/DropBook.apk
+    to: APK/DropBook.apk
+  - from: database-configuration
+    to: database-configuration
+linux:
+  target:
+    - deb
+    - dir
+  icon: images/logo.png
+  maintainer: admin@veronic.com
+  category: Office
+electronVersion: 44.7.0

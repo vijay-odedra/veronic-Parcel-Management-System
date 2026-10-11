@@ -1,0 +1,981 @@
+{
+  "buses": [
+    {
+      "id": 14,
+      "bus_number": "GJ-25-999",
+      "assigned_driver_id": null,
+      "status": "Active",
+      "created_at": "2026-06-24 12:29:59",
+      "bus_type": "AC Sleeper (2+1)",
+      "route": "Rajkot – Surat",
+      "office_id": 1
+    },
+    {
+      "id": 15,
+      "bus_number": "GJ-25-910",
+      "assigned_driver_id": 13,
+      "status": "Active",
+      "created_at": "2026-06-24 23:58:45",
+      "bus_type": "AC Sleeper (2+1)",
+      "route": "Rajkot – Surat",
+      "office_id": 1
+    },
+    {
+      "id": 16,
+      "bus_number": "GJ-25-001",
+      "assigned_driver_id": null,
+      "status": "Active",
+      "created_at": "2026-06-25 00:12:49",
+      "bus_type": "AC Sleeper (2+1)",
+      "route": "Rajkot – Surat",
+      "office_id": 1
+    },
+    {
+      "id": 17,
+      "bus_number": "GJ-25-004",
+      "assigned_driver_id": null,
+      "status": "Active",
+      "created_at": "2026-06-25 01:22:29",
+      "bus_type": "AC Sleeper (2+1)",
+      "route": "Rajkot – Surat",
+      "office_id": 1
+    },
+    {
+      "id": 19,
+      "bus_number": "GJ-25-002",
+      "assigned_driver_id": null,
+      "status": "Active",
+      "created_at": "2026-10-09 02:24:43",
+      "bus_type": "Volvo Multi-Axle (2+2)",
+      "route": "Ahmedabad – Surat",
+      "office_id": 1
+    }
+  ],
+  "bills": [
+    {
+      "id": 1,
+      "bill_no": "0001",
+      "date": "2026-06-17",
+      "driver_name": "Ramesh Makwana",
+      "bus_no": "GJ-01-LTZ1162",
+      "moklnar_name": "vijay odedra",
+      "moklnar_mobile": "9510075279",
+      "lenar_name": "vansh",
+      "lenar_mobile": "9909876756",
+      "total": 50000,
+      "jama": 50000,
+      "baki": 20000,
+      "created_at": "2026-06-17 08:52:25",
+      "office_id": 1
+    },
+    {
+      "id": 2,
+      "bill_no": "0002",
+      "date": "2026-06-18",
+      "driver_name": "chirag",
+      "bus_no": "GJ-01-LTZ1163",
+      "moklnar_name": "shujal",
+      "moklnar_mobile": "9825840119",
+      "lenar_name": "ram",
+      "lenar_mobile": "9825840819",
+      "total": 5000,
+      "jama": 5000,
+      "baki": 1000,
+      "created_at": "2026-06-18 10:55:43",
+      "office_id": 1
+    },
+    {
+      "id": 3,
+      "bill_no": "0003",
+      "date": "2026-06-18",
+      "driver_name": "vashu odedra",
+      "bus_no": "GJ-01-LTZ1166",
+      "moklnar_name": "raju",
+      "moklnar_mobile": "7878929391",
+      "lenar_name": "ram",
+      "lenar_mobile": "8909878667",
+      "total": 50000,
+      "jama": 50000,
+      "baki": 10000,
+      "created_at": "2026-06-18 11:17:35",
+      "office_id": 1
+    },
+    {
+      "id": 4,
+      "bill_no": "0004",
+      "date": "2026-06-18",
+      "driver_name": "vivek",
+      "bus_no": "GJ-01-LTZ1163",
+      "moklnar_name": "ramesh",
+      "moklnar_mobile": "215489637",
+      "lenar_name": "rohan",
+      "lenar_mobile": "369852147",
+      "total": 200000,
+      "jama": 200000,
+      "baki": 50000,
+      "created_at": "2026-06-18 11:25:12",
+      "office_id": 1
+    },
+    {
+      "id": 5,
+      "bill_no": "0005",
+      "date": "2026-06-18",
+      "driver_name": "Ramesh Makwana",
+      "bus_no": "GJ-01-LTZ1166",
+      "moklnar_name": "viren",
+      "moklnar_mobile": "6789012345",
+      "lenar_name": "radhika",
+      "lenar_mobile": "5678901234",
+      "total": 50000,
+      "jama": 50000,
+      "baki": 10000,
+      "created_at": "2026-06-18 11:50:36",
+      "office_id": 1
+    },
+    {
+      "id": 6,
+      "bill_no": "0006",
+      "date": "2026-06-18",
+      "driver_name": "vivek",
+      "bus_no": "GJ-01-LTZ1166",
+      "moklnar_name": "shujal",
+      "moklnar_mobile": "6789501234",
+      "lenar_name": "chagan",
+      "lenar_mobile": "1222134564",
+      "total": 100000,
+      "jama": 100000,
+      "baki": 20000,
+      "created_at": "2026-06-18 11:56:54",
+      "office_id": 1
+    },
+    {
+      "id": 7,
+      "bill_no": "0007",
+      "date": "2026-06-18",
+      "driver_name": "vashu",
+      "bus_no": "GJ-01-LTZ1166",
+      "moklnar_name": "harshil",
+      "moklnar_mobile": "2365897410",
+      "lenar_name": "shujal",
+      "lenar_mobile": "12458796301",
+      "total": 25000,
+      "jama": 25000,
+      "baki": 5000,
+      "created_at": "2026-06-18 12:04:45",
+      "office_id": 1
+    },
+    {
+      "id": 9,
+      "bill_no": "0008",
+      "date": "2026-06-19",
+      "driver_name": "vashu",
+      "bus_no": "GJ-01-LTZ1166",
+      "moklnar_name": "Rohit",
+      "moklnar_mobile": "8978674534",
+      "lenar_name": "Muskan",
+      "lenar_mobile": "3455677878",
+      "total": 150000,
+      "jama": 150000,
+      "baki": 60000,
+      "created_at": "2026-06-19 00:22:09",
+      "office_id": 1
+    },
+    {
+      "id": 10,
+      "bill_no": "0009",
+      "date": "2026-06-19",
+      "driver_name": "chirag",
+      "bus_no": "GJ-01-LTZ1166",
+      "moklnar_name": "Mangari",
+      "moklnar_mobile": "7890723456",
+      "lenar_name": "akshu",
+      "lenar_mobile": "2544367889",
+      "total": 50000,
+      "jama": 50000,
+      "baki": 10000,
+      "created_at": "2026-06-19 00:31:45",
+      "office_id": 1
+    },
+    {
+      "id": 11,
+      "bill_no": "0010",
+      "date": "2026-06-19",
+      "driver_name": "chirag",
+      "bus_no": "GJ-01-LTZ1163",
+      "moklnar_name": "rohan",
+      "moklnar_mobile": "37289508490",
+      "lenar_name": "ramesh",
+      "lenar_mobile": "27933475678",
+      "total": 50000,
+      "jama": 50000,
+      "baki": 25000,
+      "created_at": "2026-06-19 23:15:30",
+      "office_id": 1
+    },
+    {
+      "id": 12,
+      "bill_no": "0011",
+      "date": "2026-06-19",
+      "driver_name": "vashu",
+      "bus_no": "GJ-01-LTZ1162",
+      "moklnar_name": "vinay",
+      "moklnar_mobile": "453467767878",
+      "lenar_name": "Abhira",
+      "lenar_mobile": "676545543456",
+      "total": 100000,
+      "jama": 100000,
+      "baki": 40000,
+      "created_at": "2026-06-19 23:38:44",
+      "office_id": 1
+    },
+    {
+      "id": 13,
+      "bill_no": "0012",
+      "date": "2026-06-20",
+      "driver_name": "Vijay Odedra",
+      "bus_no": "GJ-01-LTZ1163",
+      "moklnar_name": "veer",
+      "moklnar_mobile": "3348748765",
+      "lenar_name": "vinay",
+      "lenar_mobile": "4457493777",
+      "total": 50000,
+      "jama": 50000,
+      "baki": 20000,
+      "created_at": "2026-06-20 08:12:46",
+      "office_id": 1
+    },
+    {
+      "id": 14,
+      "bill_no": "0013",
+      "date": "2026-06-20",
+      "driver_name": "Vijay Odedra",
+      "bus_no": "GJ-01-LTZ1166",
+      "moklnar_name": "nobita",
+      "moklnar_mobile": "6594945306",
+      "lenar_name": "dorimon",
+      "lenar_mobile": "5454818448",
+      "total": 500000,
+      "jama": 500000,
+      "baki": 300000,
+      "created_at": "2026-06-20 08:33:01",
+      "office_id": 1
+    },
+    {
+      "id": 15,
+      "bill_no": "0014",
+      "date": "2026-06-20",
+      "driver_name": "vansh Gohel",
+      "bus_no": "GJ-01-LTZ1166",
+      "moklnar_name": "jiyan",
+      "moklnar_mobile": "485740938",
+      "lenar_name": "suniyo",
+      "lenar_mobile": "475689347",
+      "total": 80000,
+      "jama": 80000,
+      "baki": 3000,
+      "created_at": "2026-06-20 08:45:54",
+      "office_id": 1
+    },
+    {
+      "id": 16,
+      "bill_no": "0015",
+      "date": "2026-06-20",
+      "driver_name": "vivek khokar",
+      "bus_no": "GJ-01-LTZ1166",
+      "moklnar_name": "chinchan",
+      "moklnar_mobile": "328794085",
+      "lenar_name": "shiro",
+      "lenar_mobile": "739805734",
+      "total": 1000000,
+      "jama": 1000000,
+      "baki": 200000,
+      "created_at": "2026-06-20 09:21:58",
+      "office_id": 1
+    },
+    {
+      "id": 17,
+      "bill_no": "0016",
+      "date": "2026-06-20",
+      "driver_name": "chirag",
+      "bus_no": "GJ-01-LTZ1166",
+      "moklnar_name": "rina",
+      "moklnar_mobile": "348756589",
+      "lenar_name": "metu",
+      "lenar_mobile": "837504999",
+      "total": 50000,
+      "jama": 50000,
+      "baki": 10000,
+      "created_at": "2026-06-20 11:16:49",
+      "office_id": 1
+    },
+    {
+      "id": 18,
+      "bill_no": "0017",
+      "date": "2026-06-20",
+      "driver_name": "chagan",
+      "bus_no": "GJ-01-LTZ1168",
+      "moklnar_name": "radha",
+      "moklnar_mobile": "27328486764",
+      "lenar_name": "krishana",
+      "lenar_mobile": "83247368468",
+      "total": 100000,
+      "jama": 100000,
+      "baki": 50000,
+      "created_at": "2026-06-20 11:18:37",
+      "office_id": 1
+    },
+    {
+      "id": 19,
+      "bill_no": "0018",
+      "date": "2026-06-25",
+      "driver_name": "Raju",
+      "bus_no": "GJ-25-004",
+      "moklnar_name": "vijay",
+      "moklnar_mobile": "5687986795",
+      "lenar_name": "vansh",
+      "lenar_mobile": "3489574878",
+      "total": 50000,
+      "jama": 50000,
+      "baki": 10000,
+      "created_at": "2026-06-25 10:06:54",
+      "office_id": 1
+    }
+  ],
+  "bill_items": [
+    {
+      "id": 1,
+      "bill_id": 1,
+      "from_city": "Rajkot",
+      "to_city": "Surat",
+      "description": "",
+      "qty": 10,
+      "remark": "",
+      "amount": 50000,
+      "created_at": "2026-06-17 08:52:25"
+    },
+    {
+      "id": 2,
+      "bill_id": 2,
+      "from_city": "Rajkot",
+      "to_city": "Surat",
+      "description": "",
+      "qty": 1,
+      "remark": "",
+      "amount": 5000,
+      "created_at": "2026-06-18 10:55:43"
+    },
+    {
+      "id": 3,
+      "bill_id": 3,
+      "from_city": "Rajkot",
+      "to_city": "Surat",
+      "description": "",
+      "qty": 10,
+      "remark": "",
+      "amount": 50000,
+      "created_at": "2026-06-18 11:17:35"
+    },
+    {
+      "id": 4,
+      "bill_id": 4,
+      "from_city": "Rajkot",
+      "to_city": "Surat",
+      "description": "",
+      "qty": 200,
+      "remark": "",
+      "amount": 200000,
+      "created_at": "2026-06-18 11:25:12"
+    },
+    {
+      "id": 5,
+      "bill_id": 5,
+      "from_city": "Rajkot",
+      "to_city": "Surat",
+      "description": "",
+      "qty": 10,
+      "remark": "",
+      "amount": 50000,
+      "created_at": "2026-06-18 11:50:36"
+    },
+    {
+      "id": 6,
+      "bill_id": 6,
+      "from_city": "Rajkot",
+      "to_city": "Surat",
+      "description": "",
+      "qty": 100,
+      "remark": "",
+      "amount": 100000,
+      "created_at": "2026-06-18 11:56:54"
+    },
+    {
+      "id": 7,
+      "bill_id": 7,
+      "from_city": "Rajkot",
+      "to_city": "Surat",
+      "description": "",
+      "qty": 5,
+      "remark": "",
+      "amount": 25000,
+      "created_at": "2026-06-18 12:04:45"
+    },
+    {
+      "id": 8,
+      "bill_id": 8,
+      "from_city": "Rajkot",
+      "to_city": "Surat",
+      "description": "",
+      "qty": 20,
+      "remark": "",
+      "amount": 50000,
+      "created_at": "2026-06-18 14:03:51"
+    },
+    {
+      "id": 9,
+      "bill_id": 9,
+      "from_city": "Rajkot",
+      "to_city": "Surat",
+      "description": "",
+      "qty": 10,
+      "remark": "",
+      "amount": 150000,
+      "created_at": "2026-06-19 00:22:09"
+    },
+    {
+      "id": 10,
+      "bill_id": 10,
+      "from_city": "Rajkot",
+      "to_city": "Surat",
+      "description": "",
+      "qty": 5,
+      "remark": "",
+      "amount": 50000,
+      "created_at": "2026-06-19 00:31:45"
+    },
+    {
+      "id": 11,
+      "bill_id": 11,
+      "from_city": "Rajkot",
+      "to_city": "Surat",
+      "description": "",
+      "qty": 10,
+      "remark": "",
+      "amount": 50000,
+      "created_at": "2026-06-19 23:15:30"
+    },
+    {
+      "id": 12,
+      "bill_id": 12,
+      "from_city": "Rajkot",
+      "to_city": "Surat",
+      "description": "",
+      "qty": 10,
+      "remark": "",
+      "amount": 100000,
+      "created_at": "2026-06-19 23:38:44"
+    },
+    {
+      "id": 13,
+      "bill_id": 13,
+      "from_city": "Rajkot",
+      "to_city": "Surat",
+      "description": "",
+      "qty": 10,
+      "remark": "",
+      "amount": 50000,
+      "created_at": "2026-06-20 08:12:46"
+    },
+    {
+      "id": 14,
+      "bill_id": 14,
+      "from_city": "Rajkot",
+      "to_city": "Surat",
+      "description": "",
+      "qty": 100,
+      "remark": "",
+      "amount": 500000,
+      "created_at": "2026-06-20 08:33:01"
+    },
+    {
+      "id": 15,
+      "bill_id": 15,
+      "from_city": "Rajkot",
+      "to_city": "Surat",
+      "description": "",
+      "qty": 20,
+      "remark": "",
+      "amount": 80000,
+      "created_at": "2026-06-20 08:45:54"
+    },
+    {
+      "id": 16,
+      "bill_id": 16,
+      "from_city": "Rajkot",
+      "to_city": "Surat",
+      "description": "",
+      "qty": 200,
+      "remark": "",
+      "amount": 1000000,
+      "created_at": "2026-06-20 09:21:58"
+    },
+    {
+      "id": 17,
+      "bill_id": 17,
+      "from_city": "Rajkot",
+      "to_city": "Surat",
+      "description": "",
+      "qty": 10,
+      "remark": "",
+      "amount": 50000,
+      "created_at": "2026-06-20 11:16:49"
+    },
+    {
+      "id": 18,
+      "bill_id": 18,
+      "from_city": "Rajkot",
+      "to_city": "Surat",
+      "description": "",
+      "qty": 20,
+      "remark": "",
+      "amount": 100000,
+      "created_at": "2026-06-20 11:18:37"
+    },
+    {
+      "id": 19,
+      "bill_id": 19,
+      "from_city": "Rajkot",
+      "to_city": "Surat",
+      "description": "",
+      "qty": 10,
+      "remark": "",
+      "amount": 50000,
+      "created_at": "2026-06-25 10:06:54"
+    },
+    {
+      "id": 20,
+      "bill_id": 20,
+      "from_city": "Ahmedabad",
+      "to_city": "Surat",
+      "description": "Electronics Box",
+      "qty": 2,
+      "remark": "",
+      "amount": 1500,
+      "created_at": "2026-10-07 10:58:09"
+    }
+  ],
+  "admin_permissions": [
+    {
+      "id": 1,
+      "admin_id": 2,
+      "permission_key": "dashboard",
+      "is_granted": 1
+    },
+    {
+      "id": 2,
+      "admin_id": 2,
+      "permission_key": "parcels",
+      "is_granted": 1
+    },
+    {
+      "id": 3,
+      "admin_id": 2,
+      "permission_key": "customers",
+      "is_granted": 1
+    },
+    {
+      "id": 4,
+      "admin_id": 2,
+      "permission_key": "drivers",
+      "is_granted": 1
+    },
+    {
+      "id": 5,
+      "admin_id": 2,
+      "permission_key": "delivery",
+      "is_granted": 1
+    },
+    {
+      "id": 6,
+      "admin_id": 2,
+      "permission_key": "billing",
+      "is_granted": 1
+    },
+    {
+      "id": 7,
+      "admin_id": 2,
+      "permission_key": "reports",
+      "is_granted": 1
+    },
+    {
+      "id": 8,
+      "admin_id": 3,
+      "permission_key": "dashboard",
+      "is_granted": 1
+    },
+    {
+      "id": 9,
+      "admin_id": 3,
+      "permission_key": "parcels",
+      "is_granted": 1
+    },
+    {
+      "id": 10,
+      "admin_id": 3,
+      "permission_key": "customers",
+      "is_granted": 1
+    },
+    {
+      "id": 11,
+      "admin_id": 3,
+      "permission_key": "drivers",
+      "is_granted": 1
+    },
+    {
+      "id": 12,
+      "admin_id": 3,
+      "permission_key": "delivery",
+      "is_granted": 1
+    },
+    {
+      "id": 13,
+      "admin_id": 3,
+      "permission_key": "billing",
+      "is_granted": 1
+    },
+    {
+      "id": 14,
+      "admin_id": 3,
+      "permission_key": "reports",
+      "is_granted": 1
+    },
+    {
+      "id": 15,
+      "admin_id": 4,
+      "permission_key": "dashboard",
+      "is_granted": 1
+    },
+    {
+      "id": 16,
+      "admin_id": 4,
+      "permission_key": "parcels",
+      "is_granted": 1
+    },
+    {
+      "id": 17,
+      "admin_id": 4,
+      "permission_key": "customers",
+      "is_granted": 1
+    },
+    {
+      "id": 18,
+      "admin_id": 4,
+      "permission_key": "drivers",
+      "is_granted": 1
+    },
+    {
+      "id": 19,
+      "admin_id": 4,
+      "permission_key": "delivery",
+      "is_granted": 1
+    },
+    {
+      "id": 20,
+      "admin_id": 4,
+      "permission_key": "billing",
+      "is_granted": 1
+    },
+    {
+      "id": 21,
+      "admin_id": 4,
+      "permission_key": "reports",
+      "is_granted": 1
+    },
+    {
+      "id": 22,
+      "admin_id": 5,
+      "permission_key": "dashboard",
+      "is_granted": 1
+    },
+    {
+      "id": 23,
+      "admin_id": 5,
+      "permission_key": "parcels",
+      "is_granted": 1
+    },
+    {
+      "id": 24,
+      "admin_id": 5,
+      "permission_key": "customers",
+      "is_granted": 1
+    },
+    {
+      "id": 25,
+      "admin_id": 5,
+      "permission_key": "drivers",
+      "is_granted": 1
+    },
+    {
+      "id": 26,
+      "admin_id": 5,
+      "permission_key": "delivery",
+      "is_granted": 1
+    },
+    {
+      "id": 27,
+      "admin_id": 5,
+      "permission_key": "billing",
+      "is_granted": 1
+    },
+    {
+      "id": 28,
+      "admin_id": 5,
+      "permission_key": "reports",
+      "is_granted": 1
+    }
+  ],
+  "users": [
+    {
+      "id": 1,
+      "name": "Demo User",
+      "email": "demo@example.com",
+      "password": "demo",
+      "created_at": "2026-06-20 09:43:06",
+      "office_id": 1,
+      "role": "member",
+      "status": "Active"
+    },
+    {
+      "id": 16,
+      "name": "Main Admin",
+      "email": "mainadmin@veronic.com",
+      "password": "admin123",
+      "created_at": "2026-10-07 11:42:41",
+      "office_id": 1,
+      "role": "member",
+      "status": "Active"
+    },
+    {
+      "id": 17,
+      "name": "Rajkot Sub-Admin",
+      "email": "rajkotadmin@veronic.com",
+      "password": "admin123",
+      "created_at": "2026-10-07 11:42:41",
+      "office_id": 1,
+      "role": "member",
+      "status": "Active"
+    },
+    {
+      "id": 18,
+      "name": "Simple User",
+      "email": "user@simple.com",
+      "password": "123",
+      "created_at": "2026-10-07 11:42:41",
+      "office_id": 1,
+      "role": "member",
+      "status": "Active"
+    },
+    {
+      "id": 19,
+      "name": "Admin",
+      "email": "admin@veronic.com",
+      "password": "admin123",
+      "created_at": "2026-10-07 11:42:41",
+      "office_id": 1,
+      "role": "member",
+      "status": "Active"
+    }
+  ],
+  "offices": [
+    {
+      "id": 1,
+      "office_name": "Rajkot Central Office",
+      "office_code": "OFF-001",
+      "city": "Rajkot",
+      "address": "Vavdi Main Road, Opp. PGVCL Office, Rajkot - 360004",
+      "phone": "+91 83201 48345",
+      "email": "rajkot@veronic.com",
+      "manager": "Bhanji Bhai",
+      "status": "Active",
+      "created_at": "2026-10-07 10:06:37",
+      "office_type": "Branch",
+      "closing_time": "09:00 PM",
+      "pincode": null,
+      "opening_time": "08:00 AM",
+      "state": "Gujarat"
+    },
+    {
+      "id": 2,
+      "office_name": "Ahmedabad Hub",
+      "office_code": "OFF-002",
+      "city": "Ahmedabad",
+      "address": "Geeta Mandir Bus Stand Road, Ahmedabad - 380022",
+      "phone": "+91 98258 40119",
+      "email": "ahmedabad@veronic.com",
+      "manager": "Suresh Patel",
+      "status": "Active",
+      "created_at": "2026-10-07 10:06:37",
+      "office_type": "Branch",
+      "closing_time": "09:00 PM",
+      "pincode": null,
+      "opening_time": "08:00 AM",
+      "state": "Gujarat"
+    },
+    {
+      "id": 3,
+      "office_name": "Surat Central Office",
+      "office_code": "OFF-003",
+      "city": "Surat",
+      "address": "Rupa Apt, Opp. Umiya Dham, Varachha Road, Surat - 395006",
+      "phone": "+91 89801 91525",
+      "email": "surat@veronic.com",
+      "manager": "Pravin Bhai",
+      "status": "Active",
+      "created_at": "2026-10-07 10:06:37",
+      "office_type": "Branch",
+      "closing_time": "09:00 PM",
+      "pincode": null,
+      "opening_time": "08:00 AM",
+      "state": "Gujarat"
+    },
+    {
+      "id": 4,
+      "office_name": "Jamnagar Branch",
+      "office_code": "OFF-004",
+      "city": "Jamnagar",
+      "address": "Indira Gandhi Marg, Near Gurudwara, Jamnagar - 361001",
+      "phone": "+91 94282 11020",
+      "email": "jamnagar@veronic.com",
+      "manager": "Kishore Sinh",
+      "status": "Active",
+      "created_at": "2026-10-07 10:06:37",
+      "office_type": "Branch",
+      "closing_time": "09:00 PM",
+      "pincode": null,
+      "opening_time": "08:00 AM",
+      "state": "Gujarat"
+    },
+    {
+      "id": 5,
+      "office_name": "Morbi Office",
+      "office_code": "OFF-005",
+      "city": "Morbi",
+      "address": "Sanala Road, Near New Bus Stand, Morbi - 363641",
+      "phone": "+91 97245 88990",
+      "email": "morbi@veronic.com",
+      "manager": "Dilip Bhai",
+      "status": "Active",
+      "created_at": "2026-10-07 10:06:37",
+      "office_type": "Branch",
+      "closing_time": "09:00 PM",
+      "pincode": null,
+      "opening_time": "08:00 AM",
+      "state": "Gujarat"
+    }
+  ],
+  "admins": [
+    {
+      "id": 1,
+      "name": "Main Admin (Super)",
+      "username": "main_admin",
+      "email": "mainadmin@veronic.com",
+      "password": "admin123",
+      "phone": "+91 95100 75279",
+      "office_id": null,
+      "role": "main_admin",
+      "status": "Active",
+      "last_login": "2026-10-09 03:29:31",
+      "created_at": "2026-10-07 10:06:37"
+    },
+    {
+      "id": 2,
+      "name": "Rajkot Sub-Admin",
+      "username": "rajkot_admin",
+      "email": "rajkotadmin@veronic.com",
+      "password": "admin123",
+      "phone": "+91 98765 43210",
+      "office_id": 1,
+      "role": "sub_admin",
+      "status": "Active",
+      "last_login": "2026-10-07 10:59:10",
+      "created_at": "2026-10-07 10:06:37"
+    },
+    {
+      "id": 5,
+      "name": "Ahmedabad Branch Admin",
+      "username": "ahmedabad_admin",
+      "email": "ahmedabad@veronic.com",
+      "password": "BranchPassword@123",
+      "phone": "+91 91234 56789",
+      "office_id": 2,
+      "role": "sub_admin",
+      "status": "Active",
+      "last_login": "2026-10-07 10:57:07",
+      "created_at": "2026-10-07 10:57:04"
+    }
+  ],
+  "drivers": [
+    {
+      "id": 13,
+      "name": "vansh gohal",
+      "mobile": "34275677854",
+      "created_at": "2026-06-24 23:59:01",
+      "license_no": "GJ-03-2022-1481",
+      "status": "Active",
+      "office_id": 1
+    },
+    {
+      "id": 14,
+      "name": "Ram odedra",
+      "mobile": "8237564738",
+      "created_at": "2026-06-25 00:12:13",
+      "license_no": "GJ-03-2022-1518",
+      "status": "Active",
+      "office_id": 1
+    },
+    {
+      "id": 15,
+      "name": "Raju",
+      "mobile": "7832637836",
+      "created_at": "2026-06-25 01:09:47",
+      "license_no": "GJ-03-2022-1555",
+      "status": "Active",
+      "office_id": 1
+    },
+    {
+      "id": 22,
+      "name": "ramesh",
+      "mobile": "847358746",
+      "created_at": "2026-06-25 10:02:36",
+      "license_no": "GJ-03-2022-1814",
+      "status": "Active",
+      "office_id": 1
+    },
+    {
+      "id": 23,
+      "name": "shujal",
+      "mobile": "7875846786",
+      "created_at": "2026-06-25 10:51:02",
+      "license_no": "GJ-03-2022-1851",
+      "status": "Active",
+      "office_id": 1
+    },
+    {
+      "id": 25,
+      "name": "rohit",
+      "mobile": "1244211243",
+      "created_at": "2026-10-09 02:19:11",
+      "license_no": "GJ-03-1234-3245",
+      "status": "Active",
+      "office_id": 1
+    },
+    {
+      "id": 27,
+      "name": "rakesh",
+      "mobile": "1234554321",
+      "created_at": "2026-10-09 02:23:42",
+      "license_no": "GJ-03-1234-5678",
+      "status": "Active",
+      "office_id": 1
+    }
+  ]
+}

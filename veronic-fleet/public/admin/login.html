@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>DropBook | Portal Login</title>
+  <link rel="icon" type="image/png" href="../images/logo.png">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- Firebase SDKs (Non-blocking background load) -->
+  <script defer src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script defer src="../js/firebase-client.js"></script>
+  <style>
+    :root {
+      --primary: #084c50;
+      --primary-dark: #052a2d;
+      --primary-light: #0d6b70;
+      --accent-gold: #f59e0b;
+      --text-dark: #0f172a;
+      --text-muted: #64748b;
+      --border-color: #dce8e8;
+      --card-bg: #ffffff;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #052a2d 0%, #084c50 50%, #063c40 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 1.5rem;
+      color: var(--text-dark);
+      position: relative;
+    }
+
+    /* Subtle background grid pattern */
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none;
+    }
+
+    .login-wrapper {
+      max-width: 440px;
+      width: 100%;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Floating Round Logo Badge */
+    .avatar-floating-badge {
+      width: 96px;
+      height: 96px;
+      background: #ffffff;
+      border: 4px solid #ffffff;
+      border-radius: 50%;
+      position: absolute;
+      top: -48px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+      overflow: hidden;
+      padding: 0;
+    }
+
+    .avatar-floating-badge img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+      display: block;
+    }
+
+    .card {
+      background: var(--card-bg);
+      width: 100%;
+      border-radius: 28px;
+      box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 58px 34px 34px;
+      position: relative;
+    }
+
+    .card-header {
+      text-align: center;
+      margin-bottom: 26px;
+    }
+
+    .role-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      background: #fef3c7;
+      color: #92400e;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      border: 1px solid #fde68a;
+    }
+
+    .card-header h1 {
+      font-size: 1.45rem;
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .card-header p {
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* Input Field Container with Connected Left Icon */
+    .input-box-row {
+      display: flex;
+      align-items: stretch;
+      background: #ffffff;
+      border: 1.5px solid #dce8e8;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 16px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .input-box-row:focus-within {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(8, 76, 80, 0.12);
+    }
+
+    .input-icon-cell {
+      background: #084c50;
+      color: #ffffff;
+      width: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.05rem;
+      flex-shrink: 0;
+    }
+
+    .input-box-row input {
+      flex: 1;
+      border: none;
+      outline: none;
+      padding: 13px 14px;
+      font-size: 0.92rem;
+      font-weight: 500;
+      color: var(--text-dark);
+      background: transparent;
+    }
+
+    .input-box-row input::placeholder {
+      color: #94a3b8;
+      font-weight: 400;
+    }
+
+    .toggle-pwd-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #94a3b8;
+      font-size: 0.95rem;
+      padding: 0 14px;
+      display: flex;
+      align-items: center;
+      transition: color 0.2s;
+    }
+
+    .toggle-pwd-btn:hover {
+      color: var(--primary);
+    }
+
+    .form-options {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 14px 0 22px;
+      font-size: 0.82rem;
+    }
+
+    .remember-cell {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #475569;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .remember-cell input {
+      accent-color: var(--primary);
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+
+    .forgot-link {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .forgot-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Floating Pill Button */
+    .submit-pill-btn {
+      background: #084c50;
+      border: none;
+      width: 100%;
+      padding: 14px;
+      border-radius: 14px;
+      font-weight: 800;
+      font-size: 0.95rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+      box-shadow: 0 8px 22px rgba(8, 76, 80, 0.35);
+    }
+
+    .submit-pill-btn:hover {
+      background: #052a2d;
+      box-shadow: 0 10px 26px rgba(8, 76, 80, 0.45);
+    }
+
+    .submit-pill-btn:active {
+      transform: scale(0.99);
+    }
+
+    .message-area {
+      margin-top: 14px;
+      font-size: 0.82rem;
+      padding: 9px 12px;
+      border-radius: 10px;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .error-msg {
+      color: #dc2626;
+      background: #fef2f2;
+      border: 1px solid #fee2e2;
+    }
+
+    .success-msg {
+      color: #047857;
+      background: #e6f7ef;
+      border: 1px solid #cceee0;
+    }
+
+    /* Demo Quick Logins */
+    .demo-section {
+      margin-top: 24px;
+      padding-top: 18px;
+      border-top: 1px dashed #cbd5e1;
+    }
+
+    .demo-title {
+      font-size: 0.74rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #64748b;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .demo-buttons-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .demo-pill {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: #084c50;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .demo-pill:hover {
+      background: #e6f4f2;
+      border-color: #084c50;
+    }
+
+    .demo-pill span {
+      display: block;
+      font-size: 0.68rem;
+      font-weight: 500;
+      color: #64748b;
+      margin-top: 2px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="login-wrapper">
+  <!-- Floating Round Logo Badge -->
+  <div class="avatar-floating-badge" style="background:#ffffff; border:4px solid #ffffff; border-radius:50%; overflow:hidden;">
+    <img src="../images/logo.png" alt="DropBook" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h1 style="font-size:1.65rem; font-weight:800; color:var(--primary); margin-bottom:4px;">DropBook</h1>
+      <p>Fleet & Parcel Management Portal</p>
+    </div>
+
+    <form id="adminLoginForm" autocomplete="off">
+      <!-- Username/Email Input -->
+      <div class="input-box-row">
+        <div class="input-icon-cell"><i class="fas fa-user"></i></div>
+        <input type="text" id="adminUsername" placeholder="Enter Username or Email" autocomplete="off" value="" required>
+      </div>
+
+      <!-- Password Input -->
+      <div class="input-box-row">
+        <div class="input-icon-cell"><i class="fas fa-lock"></i></div>
+        <input type="password" id="adminPassword" placeholder="••••••••" autocomplete="new-password" value="" required>
+        <button type="button" class="toggle-pwd-btn" id="togglePwdBtn" aria-label="Toggle password visibility">
+          <svg class="eye-show-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+          <svg class="eye-hide-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+        </button>
+      </div>
+
+      <div class="form-options">
+        <label class="remember-cell">
+          <input type="checkbox" id="rememberAdmin" checked> Remember me
+        </label>
+        <a href="#" class="forgot-link" id="adminForgotLink">Need Help?</a>
+      </div>
+
+      <button type="submit" class="submit-pill-btn" id="adminLoginBtn">
+        <span>LOGIN TO PORTAL</span>
+      </button>
+    </form>
+
+    <div id="adminMsgBox" class="message-area" style="display:none;"></div>
+  </div>
+</div>
+
+<script>
+  const API_URL = `${window.location.origin}/api`;
+  const ADMIN_AUTH_KEY = 'veronic_admin_token';
+  const ADMIN_USER_KEY = 'veronic_admin_user';
+
+  function setAdminAuth(token, user) {
+    localStorage.setItem(ADMIN_AUTH_KEY, token);
+    localStorage.setItem(ADMIN_USER_KEY, JSON.stringify(user));
+    localStorage.setItem('currentUser', JSON.stringify(user));
+    localStorage.setItem('userToken', token);
+  }
+
+  function getAdminToken() {
+    return localStorage.getItem(ADMIN_AUTH_KEY) || localStorage.getItem('userToken');
+  }
+
+  const msgBox = document.getElementById('adminMsgBox');
+  function showMessage(text, type = 'error') {
+    msgBox.style.display = 'flex';
+    msgBox.className = 'message-area ' + (type === 'error' ? 'error-msg' : 'success-msg');
+    msgBox.innerHTML = (type === 'error' ? '<i class="fas fa-exclamation-circle"></i> ' : '<i class="fas fa-check-circle"></i> ') + text;
+  }
+  function hideMessage() { msgBox.style.display = 'none'; }
+
+  // Toggle password visibility
+  document.getElementById('togglePwdBtn').addEventListener('click', function(e) {
+    e.preventDefault();
+    const pwdInput = document.getElementById('adminPassword');
+    const showSvg = this.querySelector('.eye-show-icon');
+    const hideSvg = this.querySelector('.eye-hide-icon');
+    if (pwdInput.type === 'password') {
+      pwdInput.type = 'text';
+      if (showSvg && hideSvg) {
+        showSvg.style.display = 'block';
+        hideSvg.style.display = 'none';
+      }
+    } else {
+      pwdInput.type = 'password';
+      if (showSvg && hideSvg) {
+        showSvg.style.display = 'none';
+        hideSvg.style.display = 'block';
+      }
+    }
+  });
+
+  document.getElementById('adminForgotLink').addEventListener('click', (e) => {
+    e.preventDefault();
+    showMessage('Please contact your System Administrator to reset your credentials.', 'success');
+  });
+
+  // Handle Form Submission
+  document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    hideMessage();
+    const usernameOrEmail = document.getElementById('adminUsername').value.trim();
+    const password = document.getElementById('adminPassword').value;
+    const btn = document.getElementById('adminLoginBtn');
+
+    if (!usernameOrEmail || !password) {
+      showMessage('Please enter both username/email and password.');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Authenticating...';
+
+    try {
+      const response = await fetch(`${API_URL}/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ usernameOrEmail, password })
+      });
+      const data = await response.json();
+
+      if (data.success && data.data && data.data.token) {
+        const user = data.data.user || data.data.admin;
+        setAdminAuth(data.data.token, user);
+        showMessage(`✅ Welcome back, ${user.name}! Redirecting...`, 'success');
+        
+        let targetUrl = 'index.html';
+        if (data.data.role !== 'main_admin') {
+          targetUrl = '../index.html';
+        }
+        
+        setTimeout(() => {
+          window.location.href = targetUrl;
+        }, 500);
+      } else {
+        showMessage(data.message || data.error || 'Invalid credentials or inactive account.');
+        btn.disabled = false;
+        btn.innerHTML = '<span>LOGIN TO PORTAL</span>';
+      }
+    } catch (err) {
+      console.error('Login error:', err);
+      showMessage('Cannot connect to server. Please verify backend is running.');
+      btn.disabled = false;
+      btn.innerHTML = '<span>LOGIN TO PORTAL</span>';
+    }
+  });
+
+  // Ensure clean placeholders on load (no browser prefill)
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      const u = document.getElementById('adminUsername');
+      const p = document.getElementById('adminPassword');
+      if (u) u.value = '';
+      if (p) p.value = '';
+    }, 60);
+  });
+</script>
+
+</body>
+</html>

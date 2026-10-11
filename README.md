@@ -1,6 +1,6 @@
-# Veronic Parcel Management System
+# DropBook - Fleet & Parcel Management ERP
 
-A simple Node.js + Express parcel/fleet management system with SQLite as the default database and optional MySQL support for the driver assignment feature.
+A modern Node.js + Express multi-office parcel and fleet management ERP system with SQLite as the default database and optional MySQL support.
 
 ## Project Structure
 
@@ -109,12 +109,30 @@ npm start
 npm run dev
 ```
 
-## Default Demo Accounts
+## Login Credentials & Portals
 
-The server inserts demo users automatically when the SQLite database is first created:
+### 👑 Main Admin & Multi-Office System
 
-- `admin@veronic.com` / `admin123`
-- `demo@example.com` / `demo`
-- `user@simple.com` / `123`
+- **Admin Login Portal URL**: [http://localhost:3001/admin/login](http://localhost:3001/admin/login)
+- **Admin Dashboard URL**: [http://localhost:3001/admin/dashboard](http://localhost:3001/admin/dashboard)
+
+| Role | Username / Email | Password | Access Scope |
+| :--- | :--- | :--- | :--- |
+| **👑 Main Admin (Super)** | `mainadmin@veronic.com` (or `main_admin`) | `admin123` | **All Offices & Systemwide (Full Access)** |
+| **🏢 Rajkot Sub-Admin** | `rajkotadmin@veronic.com` (or `rajkot_admin`) | `admin123` | **Rajkot Central Office (OFF-001)** |
+
+---
+
+### 👤 Standard User Application
+
+- **User Application URL**: [http://localhost:3001/](http://localhost:3001/)
+- **User Login URL**: [http://localhost:3001/login.html](http://localhost:3001/login.html)
+
+| Account | Email | Password |
+| :--- | :--- | :--- |
+| **Admin User** | `admin@veronic.com` | `admin123` |
+| **Demo User** | `demo@example.com` | `demo` |
+| **Simple User** | `user@simple.com` | `123` |
+
 
 

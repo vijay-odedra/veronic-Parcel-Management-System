@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "105591636213",
+    "project_id": "dropbox-113d0",
+    "storage_bucket": "dropbox-113d0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:105591636213:android:dropbookfleet113d0",
+        "android_client_info": {
+          "package_name": "com.dropbook.fleet"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDeNlNM_DobVZX17NxHKmtwspFh5SqRBOA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

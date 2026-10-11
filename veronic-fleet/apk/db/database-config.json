@@ -1,0 +1,36 @@
+{
+  "database": {
+    "type": "sqlite",
+    "filename": "veronic_fleet.db",
+    "tablesCount": 16,
+    "tables": [
+      "drivers",
+      "deleted_drivers",
+      "buses",
+      "deleted_buses",
+      "bills",
+      "bill_items",
+      "deleted_bills",
+      "deleted_bill_items",
+      "today_driver_assignments",
+      "users",
+      "sessions",
+      "offices",
+      "admins",
+      "admin_permissions",
+      "admin_sessions",
+      "admin_activity_logs"
+    ]
+  },
+  "firebase": {
+    "projectId": "dropbox-113d0",
+    "authDomain": "dropbox-113d0.firebaseapp.com",
+    "storageBucket": "dropbox-113d0.firebasestorage.app",
+    "databaseURL": "https://dropbox-113d0-default-rtdb.firebaseio.com",
+    "realtimeSync": true
+  },
+  "server": {
+    "defaultPort": 3001,
+    "apiBase": "/api"
+  }
+}

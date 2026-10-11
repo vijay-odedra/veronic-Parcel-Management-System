@@ -1,0 +1,6 @@
+version: 1.0.0
+files:
+  - url: DropBook-Setup.exe
+    sha512: auto
+path: DropBook-Setup.exe
+releaseDate: 2026-10-09T08:00:00.000Z

@@ -1,20 +1,99 @@
 {
   "name": "veronic-fleet",
   "version": "1.0.0",
-  "description": "VERONIC Fleet Management System with Soft Delete",
-  "main": "server.js",
+  "description": "VERONIC Fleet & Parcel Management ERP",
+  "author": {
+    "name": "VERONIC Fleet Management",
+    "email": "admin@veronic.com"
+  },
+  "homepage": "https://veronic.com",
+  "main": "main.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "electron": "electron .",
+    "firebase:sync": "node sync-firebase.js",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win",
+    "build:linux": "electron-builder --linux",
+    "build:all": "electron-builder -wl",
+    "apk:build": "bash ./apk/build-apk.sh"
+  },
+  "build": {
+    "appId": "com.dropbook.fleet",
+    "productName": "DropBook",
+    "copyright": "Copyright © 2026 VERONIC Fleet Management",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "**/*",
+      "!apk/**",
+      "!dist/**"
+    ],
+    "asar": true,
+    "asarUnpack": [
+      "**/node_modules/sqlite3/**",
+      "**/veronic_fleet.db"
+    ],
+    "forceCodeSigning": false,
+    "win": {
+      "target": [
+        "nsis",
+        "portable",
+        "zip",
+        "dir"
+      ],
+      "icon": "icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "allowElevation": true,
+      "createDesktopShortcut": "always",
+      "createStartMenuShortcut": true,
+      "shortcutName": "DropBook",
+      "uninstallDisplayName": "DropBook Fleet & Parcel Management",
+      "deleteAppDataOnUninstall": false,
+      "runAfterFinish": true,
+      "artifactName": "DropBook-Setup.${ext}"
+    },
+    "portable": {
+      "artifactName": "DropBook-windows.${ext}"
+    },
+    "extraResources": [
+      {
+        "from": "apk/DropBook.apk",
+        "to": "APK/DropBook.apk"
+      },
+      {
+        "from": "database-configuration",
+        "to": "database-configuration"
+      }
+    ],
+    "linux": {
+      "target": [
+        "deb",
+        "dir"
+      ],
+      "icon": "images/logo.png",
+      "maintainer": "admin@veronic.com",
+      "category": "Office"
+    }
   },
   "dependencies": {
-    "express": "^4.18.2",
-    "sqlite3": "^5.1.6",
-    "mysql2": "^3.6.0",
+    "body-parser": "^1.20.2",
     "cors": "^2.8.5",
-    "body-parser": "^1.20.2"
+    "dotenv": "^18.0.6",
+    "express": "^4.18.2",
+    "firebase": "^13.0.0",
+    "firebase-admin": "^14.5.0",
+    "mysql2": "^3.6.0",
+    "sqlite3": "^5.1.6"
   },
   "devDependencies": {
+    "electron": "^44.7.0",
+    "electron-builder": "^26.15.3",
     "nodemon": "^3.0.1"
   }
 }

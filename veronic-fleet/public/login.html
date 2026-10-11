@@ -3,248 +3,324 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>SimpleFlow | Login & Signup</title>
+  <title>DropBook | Fleet & Parcel Access</title>
+  <link rel="icon" type="image/png" href="images/logo.png">
   <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
-  <!-- Font Awesome 6 (free icons) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <!-- Font Awesome 6 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- Firebase SDKs (Non-blocking background load) -->
+  <script defer src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script defer src="js/firebase-client.js"></script>
   <style>
+    :root {
+      --primary: #084c50;
+      --primary-dark: #052a2d;
+      --primary-light: #0d6b70;
+      --accent-mint: #e6f4f2;
+      --text-dark: #082c2e;
+      --text-muted: #64748b;
+      --border-color: #dce8e8;
+      --card-bg: #ffffff;
+    }
+
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: 'Inter', sans-serif;
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
     body {
       min-height: 100vh;
-      background: linear-gradient(145deg, #f5f7fe 0%, #eef2fa 100%);
+      background: linear-gradient(135deg, #052a2d 0%, #084c50 50%, #0d6b70 100%);
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 1.5rem;
+      padding: 3rem 1.5rem;
+      color: var(--text-dark);
+    }
+
+    .login-wrapper {
+      max-width: 420px;
+      width: 100%;
+      position: relative;
+    }
+
+    /* Floating Round Logo Badge */
+    .avatar-floating-badge {
+      width: 96px;
+      height: 96px;
+      background: #ffffff;
+      border: 4px solid #ffffff;
+      border-radius: 50%;
+      position: absolute;
+      top: -48px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+      overflow: hidden;
+      padding: 0;
+    }
+
+    .avatar-floating-badge img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+      display: block;
     }
 
     .card {
-      background: #ffffff;
-      max-width: 460px;
+      background: var(--card-bg);
       width: 100%;
-      border-radius: 2rem;
-      box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.02);
-      overflow: hidden;
-      transition: all 0.2s ease;
+      border-radius: 28px;
+      box-shadow: 0 25px 55px -10px rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 56px 32px 32px;
+      position: relative;
     }
 
-    .tabs {
+    .card-header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .card-header h1 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .card-header p {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* Tabs for Sign In & Sign Up */
+    .auth-tab-row {
       display: flex;
-      border-bottom: 1px solid #e9edf2;
-      background: #ffffff;
+      background: #f1f6f6;
+      border-radius: 14px;
+      padding: 4px;
+      margin-bottom: 22px;
+      border: 1px solid #dce8e8;
     }
 
-    .tab-btn {
+    .auth-tab-btn {
       flex: 1;
       text-align: center;
-      padding: 1.1rem 0;
-      font-weight: 600;
-      font-size: 1rem;
+      padding: 9px 0;
+      font-weight: 700;
+      font-size: 0.85rem;
       background: transparent;
       border: none;
+      border-radius: 10px;
       cursor: pointer;
-      color: #8b9ab0;
+      color: var(--text-muted);
       transition: all 0.2s;
-      letter-spacing: -0.2px;
     }
 
-    .tab-btn i {
-      margin-right: 8px;
-      font-size: 0.9rem;
+    .auth-tab-btn.active {
+      background: #084c50;
+      color: #ffffff;
+      box-shadow: 0 4px 10px rgba(8, 76, 80, 0.2);
     }
 
-    .tab-btn.active {
-      color: #3b82f6;
-      border-bottom: 2.5px solid #3b82f6;
+    /* Input Field Container with Connected Left Icon (Matching reference image) */
+    .input-box-row {
+      display: flex;
+      align-items: stretch;
       background: #ffffff;
+      border: 1.5px solid #dce8e8;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 16px;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
 
-    .form-container {
-      padding: 2rem 1.8rem 2rem 1.8rem;
+    .input-box-row:focus-within {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(8, 76, 80, 0.12);
     }
 
-    .form-heading {
-      font-size: 1.65rem;
-      font-weight: 700;
-      color: #1a2634;
-      margin-bottom: 0.3rem;
-    }
-
-    .form-sub {
-      color: #6c7a91;
-      font-size: 0.85rem;
-      margin-bottom: 1.6rem;
-      border-left: 3px solid #3b82f6;
-      padding-left: 0.7rem;
-    }
-
-    .input-group {
-      margin-bottom: 1.2rem;
-    }
-
-    .input-label {
-      display: block;
-      font-size: 0.8rem;
-      font-weight: 500;
-      color: #334155;
-      margin-bottom: 0.4rem;
-    }
-
-    .input-field {
+    .input-icon-cell {
+      background: #084c50;
+      color: #ffffff;
+      width: 48px;
       display: flex;
       align-items: center;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 1rem;
-      padding: 0.6rem 0.8rem;
-      transition: all 0.2s;
+      justify-content: center;
+      font-size: 1.05rem;
+      flex-shrink: 0;
     }
 
-    .input-field i {
-      color: #94a3b8;
-      font-size: 1rem;
-      width: 28px;
-    }
-
-    .input-field input {
+    .input-box-row input {
+      flex: 1;
       border: none;
-      background: transparent;
-      width: 100%;
-      font-size: 0.9rem;
-      padding: 0.5rem 0;
       outline: none;
-      color: #0f172a;
+      padding: 13px 14px;
+      font-size: 0.92rem;
       font-weight: 500;
+      color: var(--text-dark);
+      background: transparent;
     }
 
-    .input-field input::placeholder {
-      color: #bbc4d2;
+    .input-box-row input::placeholder {
+      color: #94a3b8;
       font-weight: 400;
     }
 
-    .input-field:focus-within {
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
-      background: #ffffff;
-    }
-
-    .toggle-pwd {
+    .toggle-pwd-btn {
       background: none;
       border: none;
       cursor: pointer;
       color: #94a3b8;
-      font-size: 0.9rem;
-      padding: 0 4px;
+      font-size: 0.95rem;
+      padding: 0 14px;
+      display: flex;
+      align-items: center;
+      transition: color 0.2s;
     }
 
-    .toggle-pwd:hover {
-      color: #3b82f6;
+    .toggle-pwd-btn:hover {
+      color: var(--primary);
     }
 
     .form-options {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      margin: 1rem 0 1.4rem 0;
-      font-size: 0.8rem;
+      justify-content: space-between;
+      margin: 14px 0 20px;
+      font-size: 0.82rem;
     }
 
-    .remember {
+    .remember-cell {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 6px;
       color: #475569;
+      cursor: pointer;
+      font-weight: 600;
     }
 
-    .remember input {
-      accent-color: #3b82f6;
+    .remember-cell input {
+      accent-color: var(--primary);
       width: 16px;
       height: 16px;
-      margin: 0;
       cursor: pointer;
     }
 
     .forgot-link, .switch-link {
-      color: #3b82f6;
+      color: var(--primary);
       text-decoration: none;
-      font-weight: 500;
+      font-weight: 600;
       cursor: pointer;
+      transition: color 0.2s;
     }
 
     .forgot-link:hover, .switch-link:hover {
+      color: var(--primary-dark);
       text-decoration: underline;
     }
 
-    .action-btn {
-      background: #3b82f6;
+    /* Floating Pill Button */
+    .submit-pill-btn {
+      background: #084c50;
       border: none;
       width: 100%;
-      padding: 0.8rem;
-      border-radius: 1.5rem;
-      font-weight: 600;
+      padding: 14px;
+      border-radius: 14px;
+      font-weight: 800;
       font-size: 0.95rem;
-      color: white;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #ffffff;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
       cursor: pointer;
-      transition: all 0.2s;
-      margin-top: 0.3rem;
-      box-shadow: 0 2px 6px rgba(59,130,246,0.2);
+      transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+      box-shadow: 0 8px 22px rgba(8, 76, 80, 0.35);
     }
 
-    .action-btn:hover {
-      background: #2563eb;
-      transform: scale(0.98);
-      box-shadow: 0 4px 12px rgba(59,130,246,0.25);
+    .submit-pill-btn:hover {
+      background: #052a2d;
+      box-shadow: 0 10px 26px rgba(8, 76, 80, 0.45);
     }
 
-    .action-btn:active {
-      transform: scale(0.97);
+    .submit-pill-btn:active {
+      transform: scale(0.99);
     }
 
     .message-area {
-      margin-top: 1rem;
-      font-size: 0.75rem;
-      padding: 0.5rem 0.8rem;
-      border-radius: 1rem;
+      margin-top: 14px;
+      font-size: 0.82rem;
+      padding: 9px 12px;
+      border-radius: 10px;
       text-align: center;
-      background: #f1f5f9;
-      color: #334155;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 6px;
+      transition: all 0.2s;
     }
 
     .error-msg {
       color: #dc2626;
       background: #fef2f2;
+      border: 1px solid #fee2e2;
     }
 
     .success-msg {
-      color: #16a34a;
-      background: #f0fdf4;
+      color: #047857;
+      background: #e6f7ef;
+      border: 1px solid #cceee0;
     }
 
     .info-msg {
-      color: #3b82f6;
-      background: #eff6ff;
+      color: var(--primary);
+      background: var(--accent-mint);
+      border: 1px solid #d4ece8;
     }
 
-    .switch-prompt {
-      text-align: center;
-      margin-top: 1.2rem;
-      font-size: 0.8rem;
-      color: #5b6e8c;
+    .demo-bar {
+      margin-top: 18px;
+      background: #f4f8f8;
+      border: 1px dashed #bcd5d5;
+      border-radius: 12px;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      color: var(--text-dark);
+    }
+
+    .demo-btn {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 4px 10px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--primary);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .demo-btn:hover {
+      background: var(--accent-mint);
     }
 
     .form-panel {
@@ -254,742 +330,290 @@
     .form-panel.active-panel {
       display: block;
     }
-
-    @media (max-width: 480px) {
-      .form-container {
-        padding: 1.5rem;
-      }
-      .tab-btn {
-        padding: 0.9rem 0;
-        font-size: 0.9rem;
-      }
-    }
   </style>
 </head>
 <body>
-<div class="card">
-  <div class="tabs">
-    <button class="tab-btn active" id="loginTabBtn"><i class="fas fa-sign-in-alt"></i> Login</button>
-    <button class="tab-btn" id="signupTabBtn"><i class="fas fa-user-plus"></i> Sign Up</button>
+
+<div class="login-wrapper">
+  <!-- Floating Round Logo Badge -->
+  <div class="avatar-floating-badge" style="background:#ffffff; border:4px solid #ffffff; border-radius:50%; overflow:hidden;">
+    <img src="images/logo.png" alt="DropBook" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">
   </div>
 
-  <div class="form-container">
-    <!-- LOGIN FORM PANEL -->
-    <div id="loginPanel" class="form-panel active-panel">
-      <div class="form-heading">Welcome back</div>
-      <div class="form-sub">Sign in to your account</div>
+  <div class="card">
+    <div class="card-header">
+      <h1 style="font-size:1.65rem; font-weight:800; color:var(--primary); margin-bottom:4px;">DropBook</h1>
+      <p>Fleet & Parcel Management Portal</p>
+    </div>
 
-      <form id="loginFormElement">
-        <div class="input-group">
-          <label class="input-label"><i class="far fa-envelope"></i> Email</label>
-          <div class="input-field">
-            <i class="fas fa-envelope"></i>
-            <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email">
-          </div>
+    <!-- Toggle Tabs -->
+    <div class="auth-tab-row">
+      <button class="auth-tab-btn active" id="loginTabBtn"><i class="fas fa-sign-in-alt"></i> Login</button>
+      <button class="auth-tab-btn" id="signupTabBtn"><i class="fas fa-user-plus"></i> Sign Up</button>
+    </div>
+
+    <!-- SIGN IN PANEL -->
+    <div id="loginPanel" class="form-panel active-panel">
+      <form id="loginFormElement" autocomplete="off">
+        <!-- Email / Username Input with Dark Connected Prefix -->
+        <div class="input-box-row">
+          <div class="input-icon-cell"><i class="fas fa-user"></i></div>
+          <input type="text" id="loginEmail" placeholder="Enter Username or Email" autocomplete="off" value="" required>
         </div>
 
-        <div class="input-group">
-          <label class="input-label"><i class="fas fa-lock"></i> Password</label>
-          <div class="input-field">
-            <i class="fas fa-key"></i>
-            <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
-            <button type="button" class="toggle-pwd" data-target="loginPassword"><i class="far fa-eye-slash"></i></button>
-          </div>
+        <!-- Password Input with Dark Connected Prefix -->
+        <div class="input-box-row">
+          <div class="input-icon-cell"><i class="fas fa-lock"></i></div>
+          <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="new-password" value="" required>
+          <button type="button" class="toggle-pwd-btn" data-target="loginPassword" aria-label="Toggle password visibility">
+            <svg class="eye-show-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            <svg class="eye-hide-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+          </button>
         </div>
 
         <div class="form-options">
-          <label class="remember">
-            <input type="checkbox" id="loginRemember"> Remember me
+          <label class="remember-cell">
+            <input type="checkbox" id="loginRemember" checked> Remember me
           </label>
-          <a href="#" class="forgot-link" id="forgotPasswordLink">Forgot password?</a>
+          <a href="#" class="forgot-link" id="forgotPasswordLink">Forgot Password?</a>
         </div>
 
-        <button type="submit" class="action-btn" id="loginSubmitBtn"><span>Sign In</span> <i class="fas fa-arrow-right"></i></button>
+        <button type="submit" class="submit-pill-btn" id="loginSubmitBtn">
+          <span>Login</span>
+        </button>
       </form>
-      <div class="switch-prompt">
-        New here? <a href="#" class="switch-link" id="switchToSignupLink">Create an account</a>
+
+      <div style="text-align:center; margin-top:20px; font-size:0.82rem; color:#64748b;">
+        Don't have an account? <a href="#" class="switch-link" id="switchToSignupLink">Sign Up</a>
       </div>
     </div>
 
-    <!-- SIGNUP FORM PANEL -->
+    <!-- SIGN UP PANEL -->
     <div id="signupPanel" class="form-panel">
-      <div class="form-heading">Create account</div>
-      <div class="form-sub">Join us in one click</div>
-
       <form id="signupFormElement">
-        <div class="input-group">
-          <label class="input-label"><i class="fas fa-user"></i> Full name</label>
-          <div class="input-field">
-            <i class="fas fa-user-circle"></i>
-            <input type="text" id="signupName" placeholder="Alex Johnson" autocomplete="name">
-          </div>
+        <div class="input-box-row">
+          <div class="input-icon-cell"><i class="fas fa-user-tag"></i></div>
+          <input type="text" id="signupName" placeholder="Full Name" autocomplete="name" required>
         </div>
 
-        <div class="input-group">
-          <label class="input-label"><i class="far fa-envelope"></i> Email</label>
-          <div class="input-field">
-            <i class="fas fa-envelope"></i>
-            <input type="email" id="signupEmail" placeholder="hello@domain.com" autocomplete="email">
-          </div>
+        <div class="input-box-row">
+          <div class="input-icon-cell"><i class="fas fa-envelope"></i></div>
+          <input type="email" id="signupEmail" placeholder="Email ID" autocomplete="email" required>
         </div>
 
-        <div class="input-group">
-          <label class="input-label"><i class="fas fa-lock"></i> Password</label>
-          <div class="input-field">
-            <i class="fas fa-key"></i>
-            <input type="password" id="signupPassword" placeholder="Create a strong password">
-            <button type="button" class="toggle-pwd" data-target="signupPassword"><i class="far fa-eye-slash"></i></button>
-          </div>
+        <div class="input-box-row">
+          <div class="input-icon-cell"><i class="fas fa-lock"></i></div>
+          <input type="password" id="signupPassword" placeholder="Password (min 3 chars)" autocomplete="new-password" required>
+          <button type="button" class="toggle-pwd-btn" data-target="signupPassword" aria-label="Toggle password visibility">
+            <svg class="eye-show-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            <svg class="eye-hide-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+          </button>
         </div>
 
-        <div class="input-group">
-          <label class="input-label"><i class="fas fa-check-circle"></i> Confirm password</label>
-          <div class="input-field">
-            <i class="fas fa-shield-alt"></i>
-            <input type="password" id="signupConfirm" placeholder="Repeat your password">
-            <button type="button" class="toggle-pwd" data-target="signupConfirm"><i class="far fa-eye-slash"></i></button>
-          </div>
+        <div class="input-box-row">
+          <div class="input-icon-cell"><i class="fas fa-shield-alt"></i></div>
+          <input type="password" id="signupConfirm" placeholder="Confirm Password" autocomplete="new-password" required>
+          <button type="button" class="toggle-pwd-btn" data-target="signupConfirm" aria-label="Toggle password visibility">
+            <svg class="eye-show-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            <svg class="eye-hide-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+          </button>
         </div>
 
-        <button type="submit" class="action-btn" id="signupSubmitBtn"><span>Sign Up</span> <i class="fas fa-user-check"></i></button>
+        <button type="submit" class="submit-pill-btn" id="signupSubmitBtn" style="margin-top:12px;">
+          <span>Create Account</span>
+        </button>
       </form>
-      <div class="switch-prompt">
-        Already have an account? <a href="#" class="switch-link" id="switchToLoginLink">Sign in</a>
+
+      <div style="text-align:center; margin-top:16px; font-size:0.82rem; color:#64748b;">
+        Already have an account? <a href="#" class="switch-link" id="switchToLoginLink">Login</a>
       </div>
     </div>
 
-    <div id="globalMessageArea" class="message-area info-msg">
-      <i class="fas fa-info-circle"></i> <span id="messageText">✨ Simple & secure access</span>
-    </div>
+    <div id="msgBox" class="message-area" style="display:none;"></div>
   </div>
 </div>
 
 <script>
-  (function() {
-    // ==============================================
-    // SQLite Database using Web SQL API
-    // ==============================================
-    
-    const DB_NAME = 'SimpleAuthDB';
-    const DB_VERSION = '1.0';
-    const DB_DISPLAY_NAME = 'Simple Authentication Database';
-    const DB_SIZE = 2 * 1024 * 1024; // 2MB
+  const API_URL = `${window.location.origin}/api`;
+  const AUTH_KEY = 'veronic_auth_token';
 
-    class SQLiteDB {
-      constructor() {
-        this.db = null;
-        this.isReady = false;
-        this.initDatabase();
-      }
+  function setAuthToken(token) { localStorage.setItem(AUTH_KEY, token); }
+  function getAuthToken() { return localStorage.getItem(AUTH_KEY); }
 
-      initDatabase() {
-        try {
-          // Open or create SQLite database
-          this.db = openDatabase(DB_NAME, DB_VERSION, DB_DISPLAY_NAME, DB_SIZE);
-          
-          // Create users table if it doesn't exist
-          this.db.transaction(tx => {
-            tx.executeSql(
-              `CREATE TABLE IF NOT EXISTS users (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                email TEXT UNIQUE NOT NULL,
-                password TEXT NOT NULL,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-              )`,
-              [],
-              () => {
-                console.log('✅ Users table created successfully');
-                this.isReady = true;
-                // Insert demo users if table is empty
-                this.insertDemoUsers();
-              },
-              (tx, error) => {
-                console.error('❌ Error creating table:', error);
-              }
-            );
-          });
-        } catch (error) {
-          console.error('❌ Database initialization error:', error);
-          showMessage('error', 'Database error. Please try again.');
+  const loginTabBtn = document.getElementById('loginTabBtn');
+  const signupTabBtn = document.getElementById('signupTabBtn');
+  const loginPanel = document.getElementById('loginPanel');
+  const signupPanel = document.getElementById('signupPanel');
+  const msgBox = document.getElementById('msgBox');
+
+  function showMessage(text, type = 'error') {
+    msgBox.style.display = 'flex';
+    msgBox.className = 'message-area ' + (type === 'error' ? 'error-msg' : (type === 'success' ? 'success-msg' : 'info-msg'));
+    msgBox.innerHTML = (type === 'error' ? '<i class="fas fa-exclamation-circle"></i> ' : (type === 'success' ? '<i class="fas fa-check-circle"></i> ' : '<i class="fas fa-info-circle"></i> ')) + text;
+  }
+
+  function hideMessage() { msgBox.style.display = 'none'; }
+
+  function switchTab(mode) {
+    hideMessage();
+    if (mode === 'login') {
+      loginTabBtn.classList.add('active');
+      signupTabBtn.classList.remove('active');
+      loginPanel.classList.add('active-panel');
+      signupPanel.classList.remove('active-panel');
+    } else {
+      signupTabBtn.classList.add('active');
+      loginTabBtn.classList.remove('active');
+      signupPanel.classList.add('active-panel');
+      loginPanel.classList.remove('active-panel');
+    }
+  }
+
+  loginTabBtn.addEventListener('click', () => switchTab('login'));
+  signupTabBtn.addEventListener('click', () => switchTab('signup'));
+  document.getElementById('switchToSignupLink')?.addEventListener('click', (e) => { e.preventDefault(); switchTab('signup'); });
+  document.getElementById('switchToLoginLink')?.addEventListener('click', (e) => { e.preventDefault(); switchTab('login'); });
+
+  document.querySelectorAll('.toggle-pwd-btn').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      const targetId = this.getAttribute('data-target');
+      const input = document.getElementById(targetId);
+      if (!input) return;
+      const showSvg = this.querySelector('.eye-show-icon');
+      const hideSvg = this.querySelector('.eye-hide-icon');
+      if (input.type === 'password') {
+        input.type = 'text';
+        if (showSvg && hideSvg) {
+          showSvg.style.display = 'block';
+          hideSvg.style.display = 'none';
+        }
+      } else {
+        input.type = 'password';
+        if (showSvg && hideSvg) {
+          showSvg.style.display = 'none';
+          hideSvg.style.display = 'block';
         }
       }
+    });
+  });
 
-      insertDemoUsers() {
-        this.db.transaction(tx => {
-          // Check if users table has data
-          tx.executeSql(
-            'SELECT COUNT(*) as count FROM users',
-            [],
-            (tx, results) => {
-              const count = results.rows.item(0).count;
-              if (count === 0) {
-                // Insert demo users
-                const demoUsers = [
-                  ['Demo User', 'demo@example.com', 'demo'],
-                  ['Simple User', 'user@simple.com', '123']
-                ];
-                
-                demoUsers.forEach(([name, email, password]) => {
-                  tx.executeSql(
-                    'INSERT INTO users (name, email, password) VALUES (?, ?, ?)',
-                    [name, email, password],
-                    () => {
-                      console.log(`✅ Demo user "${email}" inserted`);
-                    },
-                    (tx, error) => {
-                      console.error('❌ Error inserting demo user:', error);
-                    }
-                  );
-                });
-              }
-            },
-            (tx, error) => {
-              console.error('❌ Error checking user count:', error);
-            }
-          );
-        });
-      }
+  document.getElementById('fillDemoBtn')?.addEventListener('click', () => {
+    document.getElementById('loginEmail').value = 'admin@veronic.com';
+    document.getElementById('loginPassword').value = 'admin123';
+    showMessage('Demo credentials auto-filled! Click Login to proceed.', 'info');
+  });
 
-      // ==============================================
-      // CRUD Operations
-      // ==============================================
+  function fillQuickDemo(email, pwd) {
+    document.getElementById('loginEmail').value = email;
+    document.getElementById('loginPassword').value = pwd;
+    showMessage(`Credentials filled for ${email}. Click Login to enter!`, 'info');
+  }
 
-      // Find user by email
-      findUserByEmail(email) {
-        return new Promise((resolve, reject) => {
-          if (!this.db) {
-            reject(new Error('Database not initialized'));
-            return;
-          }
+  document.getElementById('forgotPasswordLink')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    showMessage('Default Main Admin: mainadmin@veronic.com / admin123 | Sub-Admin: rajkotadmin@veronic.com / admin123', 'info');
+  });
 
-          this.db.transaction(tx => {
-            tx.executeSql(
-              'SELECT * FROM users WHERE email = ?',
-              [email],
-              (tx, results) => {
-                if (results.rows.length > 0) {
-                  resolve(results.rows.item(0));
-                } else {
-                  resolve(null);
-                }
-              },
-              (tx, error) => {
-                reject(error);
-              }
-            );
-          });
-        });
-      }
+  document.getElementById('loginFormElement')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    hideMessage();
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const btn = document.getElementById('loginSubmitBtn');
 
-      // Validate user login
-      validateUser(email, password) {
-        return new Promise((resolve, reject) => {
-          if (!this.db) {
-            reject(new Error('Database not initialized'));
-            return;
-          }
+    if (!email || !password) { showMessage('Please enter both email/username and password.'); return; }
 
-          this.db.transaction(tx => {
-            tx.executeSql(
-              'SELECT * FROM users WHERE email = ? AND password = ?',
-              [email, password],
-              (tx, results) => {
-                if (results.rows.length > 0) {
-                  resolve(results.rows.item(0));
-                } else {
-                  resolve(null);
-                }
-              },
-              (tx, error) => {
-                reject(error);
-              }
-            );
-          });
-        });
-      }
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
 
-      // Create new user
-      createUser(name, email, password) {
-        return new Promise((resolve, reject) => {
-          if (!this.db) {
-            reject(new Error('Database not initialized'));
-            return;
-          }
-
-          this.db.transaction(tx => {
-            tx.executeSql(
-              'INSERT INTO users (name, email, password) VALUES (?, ?, ?)',
-              [name, email, password],
-              (tx, results) => {
-                if (results.insertId) {
-                  // Get the newly created user
-                  tx.executeSql(
-                    'SELECT * FROM users WHERE id = ?',
-                    [results.insertId],
-                    (tx, userResults) => {
-                      if (userResults.rows.length > 0) {
-                        resolve(userResults.rows.item(0));
-                      } else {
-                        resolve(null);
-                      }
-                    },
-                    (tx, error) => {
-                      reject(error);
-                    }
-                  );
-                } else {
-                  resolve(null);
-                }
-              },
-              (tx, error) => {
-                reject(error);
-              }
-            );
-          });
-        });
-      }
-
-      // Update user
-      updateUser(id, updates) {
-        return new Promise((resolve, reject) => {
-          if (!this.db) {
-            reject(new Error('Database not initialized'));
-            return;
-          }
-
-          const fields = [];
-          const values = [];
-          
-          if (updates.name) {
-            fields.push('name = ?');
-            values.push(updates.name);
-          }
-          if (updates.email) {
-            fields.push('email = ?');
-            values.push(updates.email);
-          }
-          if (updates.password) {
-            fields.push('password = ?');
-            values.push(updates.password);
-          }
-
-          if (fields.length === 0) {
-            resolve(null);
-            return;
-          }
-
-          values.push(id);
-          const query = `UPDATE users SET ${fields.join(', ')} WHERE id = ?`;
-
-          this.db.transaction(tx => {
-            tx.executeSql(
-              query,
-              values,
-              (tx, results) => {
-                if (results.rowsAffected > 0) {
-                  // Get updated user
-                  tx.executeSql(
-                    'SELECT * FROM users WHERE id = ?',
-                    [id],
-                    (tx, userResults) => {
-                      if (userResults.rows.length > 0) {
-                        resolve(userResults.rows.item(0));
-                      } else {
-                        resolve(null);
-                      }
-                    },
-                    (tx, error) => {
-                      reject(error);
-                    }
-                  );
-                } else {
-                  resolve(null);
-                }
-              },
-              (tx, error) => {
-                reject(error);
-              }
-            );
-          });
-        });
-      }
-
-      // Delete user
-      deleteUser(id) {
-        return new Promise((resolve, reject) => {
-          if (!this.db) {
-            reject(new Error('Database not initialized'));
-            return;
-          }
-
-          this.db.transaction(tx => {
-            tx.executeSql(
-              'DELETE FROM users WHERE id = ?',
-              [id],
-              (tx, results) => {
-                resolve(results.rowsAffected > 0);
-              },
-              (tx, error) => {
-                reject(error);
-              }
-            );
-          });
-        });
-      }
-
-      // Get all users (for admin purposes)
-      getAllUsers() {
-        return new Promise((resolve, reject) => {
-          if (!this.db) {
-            reject(new Error('Database not initialized'));
-            return;
-          }
-
-          this.db.transaction(tx => {
-            tx.executeSql(
-              'SELECT * FROM users ORDER BY created_at DESC',
-              [],
-              (tx, results) => {
-                const users = [];
-                for (let i = 0; i < results.rows.length; i++) {
-                  users.push(results.rows.item(i));
-                }
-                resolve(users);
-              },
-              (tx, error) => {
-                reject(error);
-              }
-            );
-          });
-        });
-      }
-
-      // Check if user exists
-      userExists(email) {
-        return new Promise((resolve, reject) => {
-          this.findUserByEmail(email)
-            .then(user => {
-              resolve(user !== null);
-            })
-            .catch(error => {
-              reject(error);
-            });
-        });
-      }
-    }
-
-    // ==============================================
-    // Initialize Database
-    // ==============================================
-    const db = new SQLiteDB();
-
-    // ==============================================
-    // DOM Elements
-    // ==============================================
-    const loginTab = document.getElementById('loginTabBtn');
-    const signupTab = document.getElementById('signupTabBtn');
-    const loginPanel = document.getElementById('loginPanel');
-    const signupPanel = document.getElementById('signupPanel');
-    const switchToSignup = document.getElementById('switchToSignupLink');
-    const switchToLogin = document.getElementById('switchToLoginLink');
-    const forgotLink = document.getElementById('forgotPasswordLink');
-
-    // message handling
-    const messageDiv = document.getElementById('globalMessageArea');
-    let messageSpan = document.getElementById('messageText');
-
-    function showMessage(type, text) {
-      messageSpan.innerText = text;
-      messageDiv.classList.remove('error-msg', 'success-msg', 'info-msg');
-      if (type === 'error') {
-        messageDiv.classList.add('error-msg');
-        messageDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> <span>${text}</span>`;
-      } else if (type === 'success') {
-        messageDiv.classList.add('success-msg');
-        messageDiv.innerHTML = `<i class="fas fa-check-circle"></i> <span>${text}</span>`;
-      } else {
-        messageDiv.classList.add('info-msg');
-        messageDiv.innerHTML = `<i class="fas fa-info-circle"></i> <span>${text}</span>`;
-      }
-      messageSpan = messageDiv.querySelector('span');
-    }
-
-    function resetToDefault() {
-      if (!messageDiv.classList.contains('error-msg') && !messageDiv.classList.contains('success-msg')) return;
-      setTimeout(() => {
-        if (messageDiv && messageSpan) {
-          showMessage('info', '✨ Ready to go');
-        }
-      }, 3000);
-    }
-
-    // Helper to update panels and active tab
-    function setActivePanel(panel) {
-      if (panel === 'login') {
-        loginPanel.classList.add('active-panel');
-        signupPanel.classList.remove('active-panel');
-        loginTab.classList.add('active');
-        signupTab.classList.remove('active');
-        showMessage('info', 'Sign in with your credentials');
-      } else {
-        signupPanel.classList.add('active-panel');
-        loginPanel.classList.remove('active-panel');
-        signupTab.classList.add('active');
-        loginTab.classList.remove('active');
-        showMessage('info', 'Join us — fill the details');
-      }
-    }
-
-    // Toggle password visibility
-    function initPasswordToggles() {
-      const toggleButtons = document.querySelectorAll('.toggle-pwd');
-      toggleButtons.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          e.preventDefault();
-          const targetId = btn.getAttribute('data-target');
-          const targetInput = document.getElementById(targetId);
-          if (targetInput) {
-            const type = targetInput.type === 'password' ? 'text' : 'password';
-            targetInput.type = type;
-            const icon = btn.querySelector('i');
-            if (type === 'text') {
-              icon.classList.remove('fa-eye-slash');
-              icon.classList.add('fa-eye');
-            } else {
-              icon.classList.remove('fa-eye');
-              icon.classList.add('fa-eye-slash');
-            }
-          }
-        });
+    try {
+      const response = await fetch(`${API_URL}/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
       });
-    }
+      const data = await response.json();
 
-    function isValidEmail(email) {
-      const re = /^[^\s@]+@([^\s@]+\.)+[^\s@]+$/;
-      return re.test(email.trim());
-    }
-
-    // ==============================================
-    // Login Handler - Uses SQLite DB
-    // ==============================================
-    const loginForm = document.getElementById('loginFormElement');
-    const loginEmail = document.getElementById('loginEmail');
-    const loginPassword = document.getElementById('loginPassword');
-    const loginRemember = document.getElementById('loginRemember');
-
-    async function handleLogin(e) {
-      e.preventDefault();
-      const email = loginEmail.value.trim();
-      const password = loginPassword.value;
-
-      if (!email) {
-        showMessage('error', 'Please enter your email address');
-        return;
-      }
-      if (!isValidEmail(email)) {
-        showMessage('error', 'Enter a valid email (e.g., name@example.com)');
-        return;
-      }
-      if (!password) {
-        showMessage('error', 'Password cannot be empty');
-        return;
-      }
-      if (password.length < 3) {
-        showMessage('error', 'Password must be at least 3 characters');
-        return;
-      }
-
-      try {
-        // Validate user from SQLite database
-        const user = await db.validateUser(email, password);
-
-        if (user) {
-          // Store session
-          sessionStorage.setItem('loggedInUser', JSON.stringify(user));
-          
-          if (loginRemember.checked) {
-            localStorage.setItem('rememberedLoginEmail', email);
-          } else {
-            localStorage.removeItem('rememberedLoginEmail');
-          }
-
-          showMessage('success', `🎉 Welcome back, ${user.name}!`);
-          
-          // Redirect to index.html after successful login
-          setTimeout(() => {
-            window.location.href = 'index.html';
-          }, 800);
-        } else {
-          // Check if user exists with this email
-          const existingUser = await db.findUserByEmail(email);
-          if (existingUser) {
-            showMessage('error', 'Incorrect password. Please try again.');
-          } else {
-            showMessage('error', 'Account not found. Please sign up first.');
-          }
-          resetToDefault();
+      if (data.success && data.data && data.data.token) {
+        setAuthToken(data.data.token);
+        if (data.data.token.startsWith('adm_')) {
+          localStorage.setItem('veronic_admin_token', data.data.token);
         }
-      } catch (error) {
-        console.error('Login error:', error);
-        showMessage('error', 'Database error. Please try again.');
-      }
-    }
-
-    // ==============================================
-    // Signup Handler - Uses SQLite DB
-    // ==============================================
-    const signupForm = document.getElementById('signupFormElement');
-    const signupName = document.getElementById('signupName');
-    const signupEmail = document.getElementById('signupEmail');
-    const signupPassword = document.getElementById('signupPassword');
-    const signupConfirm = document.getElementById('signupConfirm');
-
-    async function handleSignup(e) {
-      e.preventDefault();
-      const name = signupName.value.trim();
-      const email = signupEmail.value.trim();
-      const pwd = signupPassword.value;
-      const confirmPwd = signupConfirm.value;
-
-      if (!name) {
-        showMessage('error', 'Full name is required');
-        return;
-      }
-      if (!email) {
-        showMessage('error', 'Email address is required');
-        return;
-      }
-      if (!isValidEmail(email)) {
-        showMessage('error', 'Provide a valid email address');
-        return;
-      }
-      if (!pwd) {
-        showMessage('error', 'Create a password');
-        return;
-      }
-      if (pwd.length < 3) {
-        showMessage('error', 'Password must be at least 3 characters');
-        return;
-      }
-      if (pwd !== confirmPwd) {
-        showMessage('error', 'Passwords do not match');
-        return;
-      }
-
-      try {
-        // Check if user already exists in database
-        const exists = await db.userExists(email);
-        if (exists) {
-          showMessage('error', 'Account already exists with this email. Please login.');
-          return;
+        if (data.data.user) {
+          localStorage.setItem('veronic_user', JSON.stringify(data.data.user));
         }
 
-        // Create new user in database
-        const newUser = await db.createUser(name, email, pwd);
-        
-        if (newUser) {
-          showMessage('success', `🎉 Account created successfully! Welcome ${name}!`);
-          
-          // Auto-fill login email
-          setTimeout(() => {
-            setActivePanel('login');
-            loginEmail.value = email;
-            showMessage('success', 'Account ready! Enter your password to sign in.');
-          }, 1200);
-          
-          // Reset signup fields
-          signupName.value = '';
-          signupEmail.value = '';
-          signupPassword.value = '';
-          signupConfirm.value = '';
-        } else {
-          showMessage('error', 'Failed to create account. Please try again.');
-        }
-      } catch (error) {
-        console.error('Signup error:', error);
-        showMessage('error', 'Database error. Please try again.');
+        const roleText = data.data.role === 'main_admin' ? 'Super Admin' : (data.data.role === 'sub_admin' ? 'Office Admin' : 'User');
+        showMessage(`Welcome back! Authenticated as ${roleText}. Redirecting...`, 'success');
+
+        let targetUrl = data.data.redirectTo || 'index.html';
+        if (targetUrl.startsWith('/')) targetUrl = targetUrl.substring(1);
+        setTimeout(() => { window.location.href = targetUrl; }, 600);
+      } else {
+        showMessage(data.message || data.error || 'Invalid credentials. Please check your username/email and password.');
+        btn.disabled = false;
+        btn.innerHTML = '<span>Login</span>';
       }
-      resetToDefault();
+    } catch (err) {
+      console.error('Login error:', err);
+      showMessage('Cannot connect to server. Please ensure the server is active.');
+      btn.disabled = false;
+      btn.innerHTML = '<span>Login</span>';
     }
+  });
 
-    // ==============================================
-    // Forgot Password Handler
-    // ==============================================
-    async function handleForgot(e) {
-      e.preventDefault();
-      const email = loginEmail.value.trim();
-      if (!email) {
-        showMessage('error', 'Enter your email address to reset password');
-        return;
+  document.getElementById('signupFormElement')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    hideMessage();
+    const name = document.getElementById('signupName').value.trim();
+    const email = document.getElementById('signupEmail').value.trim();
+    const password = document.getElementById('signupPassword').value;
+    const confirm = document.getElementById('signupConfirm').value;
+    const btn = document.getElementById('signupSubmitBtn');
+
+    if (!name || !email || !password) { showMessage('Please complete all required fields.'); return; }
+    if (password !== confirm) { showMessage('Passwords do not match. Please verify.'); return; }
+    if (password.length < 3) { showMessage('Password must be at least 3 characters.'); return; }
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
+
+    try {
+      const response = await fetch(`${API_URL}/signup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password })
+      });
+      const data = await response.json();
+
+      if (data.success && data.data && data.data.token) {
+        setAuthToken(data.data.token);
+        showMessage('Account created successfully! Redirecting to dashboard...', 'success');
+        setTimeout(() => { window.location.href = 'index.html'; }, 800);
+      } else {
+        showMessage(data.error || 'Failed to create account.');
+        btn.disabled = false;
+        btn.innerHTML = '<span>Create Account</span>';
       }
-      if (!isValidEmail(email)) {
-        showMessage('error', 'Provide a valid email for password reset');
-        return;
-      }
-      
-      try {
-        const user = await db.findUserByEmail(email);
-        if (user) {
-          showMessage('success', `📧 Password reset link sent to ${email}`);
-          // In a real app, you would send an email with reset link
-        } else {
-          showMessage('error', 'No account found with this email address');
-        }
-      } catch (error) {
-        console.error('Forgot password error:', error);
-        showMessage('error', 'Database error. Please try again.');
-      }
-      resetToDefault();
+    } catch (err) {
+      console.error('Signup error:', err);
+      showMessage('Cannot connect to server.');
+      btn.disabled = false;
+      btn.innerHTML = '<span>Create Account</span>';
     }
+  });
 
-    // ==============================================
-    // Load remembered login on page load
-    // ==============================================
-    function loadRememberedLogin() {
-      const remembered = localStorage.getItem('rememberedLoginEmail');
-      if (remembered) {
-        loginEmail.value = remembered;
-        loginRemember.checked = true;
-        showMessage('info', 'Welcome back! Email prefilled.');
-      }
-    }
-
-    // ==============================================
-    // Check if user is already logged in
-    // ==============================================
-    function checkSession() {
-      const loggedInUser = sessionStorage.getItem('loggedInUser');
-      if (loggedInUser) {
-        try {
-          const user = JSON.parse(loggedInUser);
-          // User is logged in, redirect to dashboard
-          window.location.href = 'index.html';
-        } catch (e) {
-          sessionStorage.removeItem('loggedInUser');
-        }
-      }
-    }
-
-    // ==============================================
-    // Event Listeners
-    // ==============================================
-    loginForm.addEventListener('submit', handleLogin);
-    signupForm.addEventListener('submit', handleSignup);
-    forgotLink.addEventListener('click', handleForgot);
-
-    // Tab switching
-    loginTab.addEventListener('click', () => setActivePanel('login'));
-    signupTab.addEventListener('click', () => setActivePanel('signup'));
-    switchToSignup.addEventListener('click', (e) => { e.preventDefault(); setActivePanel('signup'); });
-    switchToLogin.addEventListener('click', (e) => { e.preventDefault(); setActivePanel('login'); });
-
-    // Initialize
-    initPasswordToggles();
-    loadRememberedLogin();
-    checkSession();
-    showMessage('info', '👋 Simple & clean — login or sign up');
-  })();
+  // Clear inputs on load to show clean placeholders (no auto-bypass)
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      const em = document.getElementById('loginEmail');
+      const pw = document.getElementById('loginPassword');
+      if (em) em.value = '';
+      if (pw) pw.value = '';
+    }, 60);
+  });
 </script>
+
 </body>
 </html>

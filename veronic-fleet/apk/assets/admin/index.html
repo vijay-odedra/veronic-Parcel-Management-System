@@ -1,0 +1,3860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>DropBook | Main Admin Dashboard</title>
+  <link rel="icon" type="image/png" href="../images/logo.png">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="../js/firebase-client.js"></script>
+  <style>
+    :root {
+      --primary: #084c50;
+      --primary-dark: #052a2d;
+      --primary-light: #0d6b70;
+      --accent-mint: #e6f4f2;
+      --accent-gold: #f59e0b;
+      --bg-slate: #f4f8f8;
+      --card-bg: #ffffff;
+      --border-color: #dce8e8;
+      --text-dark: #0f172a;
+      --text-muted: #64748b;
+      --sidebar-width: 260px;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --shadow-sm: 0 2px 8px rgba(8, 76, 80, 0.05);
+      --shadow-md: 0 8px 24px rgba(8, 76, 80, 0.08);
+      --shadow-lg: 0 20px 40px rgba(8, 76, 80, 0.12);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      scrollbar-width: none !important; /* Firefox */
+      -ms-overflow-style: none !important; /* IE / Edge */
+    }
+
+    *::-webkit-scrollbar,
+    html::-webkit-scrollbar,
+    body::-webkit-scrollbar,
+    .admin-main::-webkit-scrollbar,
+    .admin-sidebar::-webkit-scrollbar,
+    .table-responsive::-webkit-scrollbar,
+    .modal-body::-webkit-scrollbar {
+      display: none !important;
+      width: 0px !important;
+      height: 0px !important;
+      background: transparent !important;
+    }
+
+    html, body {
+      height: 100vh;
+      overflow: hidden;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    body {
+      background: var(--bg-slate);
+      color: var(--text-dark);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Navbar (Fixed & Locked) */
+    .admin-navbar {
+      background: #ffffff;
+      border-bottom: 1.5px solid var(--border-color);
+      padding: 12px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      flex-shrink: 0;
+      z-index: 1000;
+      box-shadow: var(--shadow-sm);
+      height: 68px;
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-logo-icon {
+      width: 42px;
+      height: 42px;
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+      color: #ffffff;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      box-shadow: 0 4px 12px rgba(8, 76, 80, 0.2);
+    }
+
+    .brand-text h1 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: 0.5px;
+      margin-bottom: 2px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-text p {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .office-pill-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent-mint);
+      border: 1px solid #c8e4e0;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .role-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .role-tag.main-admin {
+      background: #fef3c7;
+      color: #92400e;
+      border: 1px solid #fde68a;
+    }
+
+    .role-tag.sub-admin {
+      background: #e0f2fe;
+      color: #0369a1;
+      border: 1px solid #bae6fd;
+    }
+
+    .user-profile-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #f8fafc;
+      border: 1.5px solid var(--border-color);
+      padding: 6px 14px 6px 8px;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .user-profile-btn:hover {
+      background: #eef5f5;
+    }
+
+    .user-avatar-circle {
+      width: 32px;
+      height: 32px;
+      background: var(--primary);
+      color: #ffffff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+
+    .logout-btn {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 0.84rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .logout-btn:hover {
+      background: #fca5a5;
+      color: #7f1d1d;
+    }
+
+    /* Main App Layout */
+    .app-layout {
+      display: flex;
+      flex: 1;
+      height: calc(100vh - 68px);
+      overflow: hidden;
+    }
+
+    /* Left Sidebar */
+    .admin-sidebar {
+      width: var(--sidebar-width);
+      background: #ffffff;
+      border-right: 1.5px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      padding: 20px 14px;
+      gap: 24px;
+      height: 100%;
+      overflow-y: auto;
+    }
+
+    .sidebar-section-title {
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      padding: 0 12px;
+      margin-bottom: 8px;
+    }
+
+    .sidebar-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 14px;
+      border-radius: var(--radius-md);
+      color: #334155;
+      font-size: 0.88rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid transparent;
+    }
+
+    .sidebar-item i {
+      width: 20px;
+      text-align: center;
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      transition: color 0.2s;
+    }
+
+    .sidebar-item:hover {
+      background: #f1f8f8;
+      color: var(--primary);
+    }
+
+    .sidebar-item:hover i {
+      color: var(--primary);
+    }
+
+    .sidebar-item.active {
+      background: var(--accent-mint);
+      color: var(--primary);
+      border-color: #c8e4e0;
+      font-weight: 700;
+    }
+
+    .sidebar-item.active i {
+      color: var(--primary);
+    }
+
+    .sidebar-sub-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 14px 8px 36px;
+      border-radius: var(--radius-sm);
+      color: #475569;
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .sidebar-sub-item:hover {
+      color: var(--primary);
+      background: #f8fafc;
+    }
+
+    .sidebar-sub-item.active {
+      color: var(--primary);
+      font-weight: 700;
+      background: #eef7f6;
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding-top: 14px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    /* Main Content Area (Smooth Scrollable) */
+    .admin-main {
+      flex: 1;
+      height: 100%;
+      padding: 28px 36px 60px;
+      overflow-y: auto;
+      max-width: 100%;
+    }
+
+    .view-panel {
+      display: none;
+    }
+
+    .view-panel.active {
+      display: block;
+      animation: fadeIn 0.25s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Page Header */
+    .page-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .page-header-left h2 {
+      font-size: 1.55rem;
+      font-weight: 800;
+      color: var(--text-dark);
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .page-header-left p {
+      font-size: 0.86rem;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* Primary & Secondary Buttons */
+    .btn-primary {
+      background: var(--primary);
+      color: #ffffff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: var(--radius-md);
+      font-weight: 700;
+      font-size: 0.88rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+      box-shadow: 0 4px 14px rgba(8, 76, 80, 0.25);
+      text-decoration: none;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      box-shadow: 0 6px 18px rgba(8, 76, 80, 0.35);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: #ffffff;
+      color: #334155;
+      border: 1.5px solid var(--border-color);
+      padding: 9px 18px;
+      border-radius: var(--radius-md);
+      font-weight: 700;
+      font-size: 0.88rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .btn-secondary:hover {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+    }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      border-radius: 8px;
+    }
+
+    .btn-back {
+      background: #f1f5f9;
+      color: #334155;
+      border: 1px solid #cbd5e1;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.84rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .btn-back:hover {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+    }
+
+    /* 8 Summary Metric Cards (4x2 Grid) */
+    .stats-8-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+
+    .stat-card-pro {
+      background: #ffffff;
+      border: 1.5px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 110px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card-pro:hover {
+      border-color: #b9d8d6;
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+
+    .stat-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .stat-card-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--text-muted);
+    }
+
+    .stat-card-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--accent-mint);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+    }
+
+    .stat-card-value {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: var(--text-dark);
+      letter-spacing: -0.5px;
+      margin-top: 10px;
+    }
+
+    /* Content Cards & Tables */
+    .pro-card {
+      background: #ffffff;
+      border: 1.5px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 28px;
+    }
+
+    .pro-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .pro-card-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--text-dark);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .table-search-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #f8fafc;
+      border: 1.5px solid var(--border-color);
+      padding: 7px 14px;
+      border-radius: 12px;
+      width: 280px;
+    }
+
+    .table-search-bar input {
+      border: none;
+      background: transparent;
+      outline: none;
+      font-size: 0.85rem;
+      width: 100%;
+      color: var(--text-dark);
+    }
+
+    .table-responsive {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    .pro-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.86rem;
+    }
+
+    .pro-table th {
+      background: #f8fafc;
+      color: var(--text-muted);
+      font-weight: 700;
+      padding: 12px 16px;
+      border-bottom: 1.5px solid var(--border-color);
+      text-transform: uppercase;
+      font-size: 0.74rem;
+      letter-spacing: 0.6px;
+      white-space: nowrap;
+    }
+
+    .pro-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid #edf4f4;
+      color: #334155;
+      font-weight: 500;
+      vertical-align: middle;
+    }
+
+    .pro-table tbody tr:hover {
+      background: #f9fbfb;
+    }
+
+    /* Badges */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 14px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .status-badge.active, .status-badge.delivered {
+      background: #dcfce7;
+      color: #15803d;
+      border: 1px solid #bbf7d0;
+    }
+
+    .status-badge.inactive, .status-badge.cancelled {
+      background: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid #fecaca;
+    }
+
+    .status-badge.pending {
+      background: #fef3c7;
+      color: #b45309;
+      border: 1px solid #fde68a;
+    }
+
+    .status-badge.in-transit {
+      background: #e0f2fe;
+      color: #0369a1;
+      border: 1px solid #bae6fd;
+    }
+
+    .btn-open-office {
+      background: var(--primary);
+      color: #ffffff;
+      border: none;
+      padding: 7px 14px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.8rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+      box-shadow: 0 2px 6px rgba(8, 76, 80, 0.2);
+    }
+
+    .btn-open-office:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+
+    /* Multi-Step Creation Wizard */
+    .wizard-container {
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    .wizard-steps {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      margin-bottom: 32px;
+    }
+
+    .wizard-steps::before {
+      content: "";
+      position: absolute;
+      top: 20px;
+      left: 40px;
+      right: 40px;
+      height: 3px;
+      background: var(--border-color);
+      z-index: 1;
+    }
+
+    .wizard-step-node {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .step-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 3px solid var(--border-color);
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.95rem;
+      transition: all 0.3s;
+    }
+
+    .wizard-step-node.active .step-circle {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(8, 76, 80, 0.3);
+    }
+
+    .wizard-step-node.completed .step-circle {
+      background: #10b981;
+      border-color: #10b981;
+      color: #ffffff;
+    }
+
+    .step-text {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .wizard-step-node.active .step-text {
+      color: var(--primary);
+      font-weight: 800;
+    }
+
+    /* Forms */
+    .form-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .form-grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 18px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #334155;
+    }
+
+    .form-group label span.req {
+      color: #dc2626;
+    }
+
+    .form-control {
+      background: #ffffff;
+      border: 1.5px solid var(--border-color);
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 0.88rem;
+      color: var(--text-dark);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .form-control:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(8, 76, 80, 0.12);
+    }
+
+    .form-control[readonly] {
+      background: #f1f5f9;
+      color: #64748b;
+      cursor: not-allowed;
+    }
+
+    .input-with-action {
+      display: flex;
+      gap: 8px;
+    }
+
+    .input-with-action input {
+      flex: 1;
+    }
+
+    .success-callout-banner {
+      background: #ecfdf5;
+      border: 1.5px solid #a7f3d0;
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .success-callout-banner i {
+      font-size: 1.6rem;
+      color: #059669;
+    }
+
+    .success-callout-banner h4 {
+      font-size: 0.96rem;
+      font-weight: 800;
+      color: #065f46;
+    }
+
+    .success-callout-banner p {
+      font-size: 0.82rem;
+      color: #047857;
+      margin-top: 2px;
+    }
+
+    /* Confirmation Screen */
+    .confirmation-box {
+      background: #ffffff;
+      border: 2px solid #a7f3d0;
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      box-shadow: var(--shadow-md);
+      margin-bottom: 24px;
+    }
+
+    .conf-header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .conf-header .check-circle {
+      width: 56px;
+      height: 56px;
+      background: #10b981;
+      color: #ffffff;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      margin-bottom: 12px;
+      box-shadow: 0 6px 18px rgba(16, 185, 129, 0.35);
+    }
+
+    .conf-header h3 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #065f46;
+    }
+
+    .conf-details-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    .conf-sub-card {
+      background: #f8fafc;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 16px;
+    }
+
+    .conf-sub-title {
+      font-size: 0.74rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--primary);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .conf-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0;
+      font-size: 0.84rem;
+      border-bottom: 1px dashed #e2e8f0;
+    }
+
+    .conf-row:last-child {
+      border-bottom: none;
+    }
+
+    .conf-row span.label {
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .conf-row span.val {
+      color: var(--text-dark);
+      font-weight: 700;
+    }
+
+    .credentials-alert-card {
+      background: linear-gradient(135deg, #052a2d, #084c50);
+      color: #ffffff;
+      border-radius: var(--radius-md);
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 10px 24px rgba(8, 76, 80, 0.3);
+    }
+
+    .cred-title {
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #99f6e4;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .cred-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 14px 18px;
+    }
+
+    .cred-item .k {
+      font-size: 0.72rem;
+      color: #cbd5e1;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .cred-item .v {
+      font-size: 1.15rem;
+      font-family: monospace;
+      font-weight: 800;
+      color: #ffffff;
+      margin-top: 4px;
+      letter-spacing: 0.5px;
+    }
+
+    .copy-buttons-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .btn-copy {
+      background: rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.78rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s;
+    }
+
+    .btn-copy:hover {
+      background: rgba(255, 255, 255, 0.35);
+    }
+
+    /* Drill-down office dashboard tabs */
+    .drilldown-tabs-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1.5px solid var(--border-color);
+      margin-bottom: 24px;
+    }
+
+    .drill-tab-btn {
+      background: transparent;
+      border: none;
+      border-bottom: 3px solid transparent;
+      padding: 12px 20px;
+      font-weight: 700;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .drill-tab-btn:hover {
+      color: var(--primary);
+    }
+
+    .drill-tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    /* Modal Dialogs */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-card {
+      background: #ffffff;
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 640px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border-color);
+      animation: modalPop 0.2s ease;
+    }
+
+    @keyframes modalPop {
+      from { transform: scale(0.95); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .modal-header {
+      padding: 20px 24px;
+      border-bottom: 1.5px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-header h3 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--text-dark);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .modal-close-btn {
+      background: #f1f5f9;
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #64748b;
+      font-size: 1rem;
+      transition: background 0.2s;
+    }
+
+    .modal-close-btn:hover {
+      background: #e2e8f0;
+      color: var(--text-dark);
+    }
+
+    .modal-body {
+      padding: 24px;
+    }
+
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1.5px solid var(--border-color);
+      background: #f8fafc;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    /* Toast Notification */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .toast-item {
+      background: #0f172a;
+      color: #ffffff;
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-size: 0.86rem;
+      font-weight: 600;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: toastIn 0.3s ease;
+    }
+
+    .toast-item.success {
+      background: #065f46;
+      border-left: 4px solid #34d399;
+    }
+
+    .toast-item.error {
+      background: #7f1d1d;
+      border-left: 4px solid #f87171;
+    }
+
+    @keyframes toastIn {
+      from { transform: translateX(40px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    .admin-mobile-bottom-bar {
+      display: none;
+    }
+
+    .mobile-menu-btn {
+      display: none;
+      background: var(--primary);
+      border: none;
+      color: #ffffff;
+      padding: 7px 16px;
+      border-radius: 9999px;
+      font-weight: 700;
+      cursor: pointer;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      font-size: 0.88rem;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(8, 76, 80, 0.25);
+    }
+
+    .mobile-menu-btn:hover, .mobile-menu-btn:active {
+      background: var(--primary-dark);
+      transform: scale(0.97);
+    }
+
+    .sidebar-mobile-header {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 12px;
+      margin-bottom: 12px;
+      border-bottom: 1.5px solid var(--border-color);
+    }
+
+    .sidebar-mobile-close-btn {
+      background: #f1f5f9;
+      border: none;
+      color: #64748b;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.2s ease;
+    }
+
+    .sidebar-mobile-close-btn:hover {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+
+    .admin-sidebar-backdrop {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(2px);
+      z-index: 9998;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    @media (max-width: 1024px) {
+      .stats-8-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .admin-sidebar {
+        width: 220px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .app-layout {
+        flex-direction: column;
+        height: auto;
+      }
+      .admin-navbar {
+        padding: 8px 16px;
+        height: 60px;
+        min-height: 60px;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        max-width: 100vw;
+        box-sizing: border-box;
+        overflow-x: hidden;
+      }
+      .brand-section {
+        display: flex;
+        align-items: center;
+        gap: 0;
+        min-width: 0;
+        flex-shrink: 0;
+      }
+      .brand-section img {
+        height: 38px !important;
+        width: auto !important;
+        flex-shrink: 0;
+        display: block !important;
+        object-fit: contain;
+      }
+      .brand-text {
+        display: none !important;
+      }
+      .role-tag.main-admin, .role-tag.sub-admin, #headerRoleBadge {
+        display: none !important;
+      }
+      .nav-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+      }
+      .mobile-menu-btn {
+        display: inline-flex !important;
+        padding: 7px 16px;
+        font-size: 0.9rem;
+        font-weight: 700;
+        order: 2;
+      }
+      .firebase-live-pill {
+        display: inline-flex !important;
+        font-size: 0.72rem !important;
+        padding: 5px 10px !important;
+        order: 1;
+        gap: 5px !important;
+      }
+      .office-pill-badge:not(.firebase-live-pill) {
+        display: none !important;
+      }
+      .user-profile-btn {
+        display: none !important;
+      }
+      .logout-btn {
+        display: none !important;
+      }
+
+      .sidebar-mobile-user-card {
+        display: block !important;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 12px;
+        margin-bottom: 12px;
+      }
+
+      /* Mobile Drawer Sidebar Navigation */
+      .admin-sidebar {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 290px !important;
+        max-width: 85vw !important;
+        height: 100vh !important;
+        height: 100dvh !important;
+        background: #ffffff !important;
+        box-shadow: 8px 0 30px rgba(0, 0, 0, 0.25) !important;
+        z-index: 9999 !important;
+        padding: 16px !important;
+        overflow-y: auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+        transform: translateX(-105%) !important;
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        gap: 6px !important;
+        border-right: 1.5px solid var(--border-color) !important;
+        border-bottom: none !important;
+      }
+
+      .admin-sidebar.mobile-open {
+        transform: translateX(0) !important;
+      }
+
+      .admin-sidebar-backdrop.active {
+        display: block !important;
+        opacity: 1 !important;
+      }
+
+      .sidebar-mobile-header {
+        display: flex !important;
+      }
+
+      .sidebar-item, .sidebar-sub-item {
+        padding: 10px 14px !important;
+        font-size: 0.88rem !important;
+        font-weight: 700 !important;
+        border-radius: 12px !important;
+        background: #f8fafc !important;
+        color: #084c50 !important;
+        border: 1px solid #e2e8f0 !important;
+        white-space: normal !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 10px !important;
+        margin-bottom: 3px !important;
+        text-decoration: none !important;
+        box-shadow: none !important;
+      }
+
+      .sidebar-item.active, .sidebar-sub-item.active {
+        background: var(--primary) !important;
+        color: #ffffff !important;
+        border-color: var(--primary) !important;
+        box-shadow: 0 4px 12px rgba(8, 76, 80, 0.25) !important;
+      }
+
+      .sidebar-section-title {
+        display: block !important;
+        font-size: 0.72rem !important;
+        font-weight: 800 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.8px !important;
+        color: var(--text-muted) !important;
+        margin: 12px 0 4px 4px !important;
+      }
+
+      .admin-main {
+        padding: 10px 10px 85px 10px !important;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        flex: 1;
+      }
+      .stats-8-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+      .form-grid-2, .form-grid-3, .conf-details-grid, .cred-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+      .table-responsive {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+      }
+      .table-responsive table {
+        min-width: 600px;
+      }
+
+      /* Main Admin Mobile Bottom App Bar */
+      .admin-mobile-bottom-bar {
+        display: flex !important;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 64px;
+        background: #ffffff;
+        border-top: 1.5px solid #dce8e8;
+        box-shadow: 0 -4px 20px rgba(8, 76, 80, 0.12);
+        z-index: 9999;
+        align-items: center;
+        justify-content: space-around;
+        padding: 0 4px;
+      }
+      .admin-bottom-item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: #5e7a82;
+        font-size: 0.68rem;
+        font-weight: 700;
+        gap: 3px;
+        cursor: pointer;
+        background: none;
+        border: none;
+        padding: 6px 0;
+        transition: color 0.2s;
+        text-decoration: none;
+      }
+      .admin-bottom-item i {
+        font-size: 1.2rem;
+      }
+      .admin-bottom-item.active, .admin-bottom-item:active {
+        color: var(--primary);
+      }
+      .admin-bottom-fab {
+        flex: 0 0 54px !important;
+        width: 54px !important;
+        height: 54px !important;
+        min-width: 54px !important;
+        max-width: 54px !important;
+        border-radius: 50% !important;
+        aspect-ratio: 1 / 1 !important;
+        background: linear-gradient(135deg, #084c50, #0d6b70) !important;
+        color: #ffffff !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        box-shadow: 0 8px 20px rgba(8, 76, 80, 0.45) !important;
+        transform: translateY(-16px) !important;
+        border: 3.5px solid #ffffff !important;
+        padding: 0 !important;
+        margin: 0 6px !important;
+      }
+      .admin-bottom-fab i {
+        font-size: 1.45rem !important;
+        line-height: 1 !important;
+        font-weight: 800 !important;
+        color: #ffffff !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP NAVBAR -->
+  <nav class="admin-navbar">
+    <div class="brand-section" style="display:flex; align-items:center; gap:12px;">
+      <img src="../images/logo.png" alt="DropBook" style="height:40px; width:auto; object-fit:contain;">
+      <div class="brand-text">
+        <h1 id="navbarMainTitle">DropBook <span class="role-tag main-admin" id="headerRoleBadge">MAIN ADMIN</span></h1>
+        <p id="navbarSubTitle">Fleet & Parcel Management ERP</p>
+      </div>
+    </div>
+
+    <div class="nav-actions">
+      <div class="office-pill-badge firebase-live-pill" title="Firebase Firestore: Live & Connected" style="background:#e6f4f2; color:#084c50; border:1px solid #b8ded9; display:inline-flex; align-items:center; gap:6px; font-weight:700;">
+        <span style="width:8px; height:8px; background:#10b981; border-radius:50%; display:inline-block; box-shadow:0 0 0 2px rgba(16,185,129,0.35);"></span>
+        <i class="fas fa-cloud"></i> <span>Live</span>
+      </div>
+
+      <div class="office-pill-badge" id="currentOfficePill">
+        <i class="fas fa-globe"></i> <span id="currentOfficeName">All Offices (Systemwide)</span>
+      </div>
+
+      <div class="user-profile-btn" id="userProfileBtn">
+        <div class="user-avatar-circle" id="userAvatarLetter">M</div>
+        <div style="text-align: left;">
+          <div style="font-size:0.84rem; font-weight:800; color:var(--text-dark);" id="navAdminName">Main Admin</div>
+          <div style="font-size:0.7rem; color:var(--text-muted);" id="navAdminRole">Super Administrator</div>
+        </div>
+      </div>
+
+      <button class="logout-btn" id="adminLogoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+
+      <!-- MOBILE MENU BUTTON (Visible on mobile screens) -->
+      <button class="mobile-menu-btn" id="adminMobileMenuBtn" aria-label="Toggle Navigation Menu">
+        <i class="fas fa-bars"></i>
+        <span>Menu</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- MOBILE SIDEBAR BACKDROP OVERLAY -->
+  <div class="admin-sidebar-backdrop" id="adminSidebarBackdrop"></div>
+
+  <!-- APP LAYOUT -->
+  <div class="app-layout">
+    
+    <!-- LEFT SIDEBAR / MOBILE DRAWER -->
+    <aside class="admin-sidebar" id="mainAdminSidebar">
+      <!-- Mobile Drawer Header -->
+      <div class="sidebar-mobile-header">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <img src="../images/logo.png" alt="DropBook" style="height:30px; width:auto; object-fit:contain;">
+          <span style="font-weight:800; font-size:1.05rem; color:var(--primary);">DropBook Admin</span>
+        </div>
+        <button class="sidebar-mobile-close-btn" id="sidebarMobileCloseBtn" aria-label="Close Menu">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <!-- Mobile Profile & Scope Card -->
+      <div class="sidebar-mobile-user-card" style="display:none;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+          <div class="user-avatar-circle" id="sidebarAvatarLetter" style="width:36px; height:36px; font-size:0.95rem;">M</div>
+          <div>
+            <div style="font-size:0.88rem; font-weight:800; color:var(--text-dark);" id="sidebarAdminName">Main Admin</div>
+            <div style="font-size:0.72rem; color:var(--text-muted);" id="sidebarAdminRole">Super Administrator</div>
+          </div>
+        </div>
+        <div style="display:inline-flex; align-items:center; gap:6px; background:#e6f4f2; color:#084c50; padding:5px 10px; border-radius:8px; font-size:0.75rem; font-weight:700; border:1px solid #c8e4e0; width:100%; box-sizing:border-box;">
+          <i class="fas fa-globe"></i> <span id="sidebarOfficeName" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">All Offices (Systemwide)</span>
+        </div>
+      </div>
+
+      <div class="sidebar-section-title">Navigation</div>
+      <nav class="sidebar-menu">
+        <a class="sidebar-item active" data-view="dashboard"><i class="fas fa-th-large"></i> Dashboard</a>
+      </nav>
+
+      <div class="sidebar-section-title" id="officeMgmtSection">Office Management</div>
+      <nav class="sidebar-menu" id="officeMgmtMenu">
+        <a class="sidebar-sub-item" data-view="offices"><i class="fas fa-building"></i> • All Offices</a>
+        <a class="sidebar-sub-item" data-view="add-office"><i class="fas fa-plus-circle"></i> • Add New Office</a>
+      </nav>
+
+      <div class="sidebar-section-title" id="adminMgmtSection">Admin Management</div>
+      <nav class="sidebar-menu" id="adminMgmtMenu">
+        <a class="sidebar-sub-item" data-view="admins"><i class="fas fa-user-shield"></i> • All Admins</a>
+        <a class="sidebar-sub-item" data-view="create-admin"><i class="fas fa-user-plus"></i> • Create Admin</a>
+      </nav>
+
+      <div class="sidebar-section-title">User Management</div>
+      <nav class="sidebar-menu" id="operationsMenu">
+        <a class="sidebar-item" data-view="users"><i class="fas fa-users"></i> Users</a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a class="sidebar-item" data-view="settings"><i class="fas fa-cog"></i> Settings</a>
+        <a class="sidebar-item" id="sidebarLogoutBtn" style="color:#dc2626;"><i class="fas fa-arrow-right-from-bracket"></i> Logout</a>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="admin-main">
+
+      <!-- ============================================== -->
+      <!-- VIEW 1: MAIN ADMIN DASHBOARD OVERVIEW           -->
+      <!-- ============================================== -->
+      <section class="view-panel active" id="view-dashboard">
+        <div class="page-header-row">
+          <div class="page-header-left">
+            <h2><i class="fas fa-chart-pie" style="color:var(--primary);"></i> Main Admin Dashboard</h2>
+            <p>Systemwide overview across all regional transport hubs and branch offices</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn-secondary btn-sm" onclick="loadDashboardData()"><i class="fas fa-rotate"></i> Refresh</button>
+            <a class="btn-primary" data-view="add-office"><i class="fas fa-plus"></i> Add New Office</a>
+          </div>
+        </div>
+
+        <!-- LIVE OFFICE SELECTOR / SWITCHER -->
+        <div class="pro-card" style="padding: 16px 22px; margin-bottom: 22px; background: linear-gradient(135deg, #ffffff, #f0f7f7); border: 1.5px solid #c8e4e0;">
+          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
+            <div style="display: flex; align-items: center; gap: 14px;">
+              <div style="width: 42px; height: 42px; border-radius: 12px; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(8,76,80,0.2); flex-shrink: 0;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"></path><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"></path><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"></path><path d="M10 6h4"></path><path d="M10 10h4"></path><path d="M10 14h4"></path><path d="M10 18h4"></path></svg>
+              </div>
+              <div>
+                <div style="font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: var(--primary);">Live Office Dashboard Scope</div>
+                <div style="font-size: 1.05rem; font-weight: 800; color: var(--text-dark);" id="liveSelectedOfficeLabel">🌐 All Offices (Global Real-Time Overview)</div>
+              </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+              <label style="font-size: 0.82rem; font-weight: 700; color: #334155;"><i class="fas fa-filter"></i> Select Live Office:</label>
+              <select id="mainDashboardOfficeFilter" class="form-control" style="min-width: 260px; font-weight: 700; color: var(--primary); padding: 9px 14px; background: #ffffff;" onchange="handleLiveOfficeFilterChange(this.value)">
+                <option value="ALL">🌐 All Offices (Systemwide)</option>
+              </select>
+              <button class="btn-primary btn-sm" id="btnQuickOpenSelectedOffice" style="display: none;" onclick="openCurrentlyFilteredOffice()"><i class="fas fa-arrow-up-right-from-square"></i> Open Full Office</button>
+              <button class="btn-secondary btn-sm" id="btnResetToAllOffices" style="display: none;" onclick="resetLiveOfficeFilter()"><i class="fas fa-rotate-left"></i> Reset to All</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 8 SUMMARY CARDS -->
+        <div class="stats-8-grid">
+          <!-- 1. Card 1 -->
+          <div class="stat-card-pro">
+            <div class="stat-card-header">
+              <span class="stat-card-label" id="lblCard1">Total Offices</span>
+              <div class="stat-card-icon" id="iconCard1"><i class="fas fa-building"></i></div>
+            </div>
+            <div class="stat-card-value" id="cardTotalOffices">0</div>
+          </div>
+          <!-- 2. Card 2 -->
+          <div class="stat-card-pro">
+            <div class="stat-card-header">
+              <span class="stat-card-label" id="lblCard2">Active Offices</span>
+              <div class="stat-card-icon" id="iconCard2" style="background:#dcfce7; color:#15803d;"><i class="fas fa-check-circle"></i></div>
+            </div>
+            <div class="stat-card-value" id="cardActiveOffices">0</div>
+          </div>
+          <!-- 3. Card 3 -->
+          <div class="stat-card-pro">
+            <div class="stat-card-header">
+              <span class="stat-card-label" id="lblCard3">Total Office Admins</span>
+              <div class="stat-card-icon" id="iconCard3"><i class="fas fa-user-shield"></i></div>
+            </div>
+            <div class="stat-card-value" id="cardTotalAdmins">0</div>
+          </div>
+          <!-- 4. Card 4 -->
+          <div class="stat-card-pro">
+            <div class="stat-card-header">
+              <span class="stat-card-label" id="lblCard4">Total Parcels</span>
+              <div class="stat-card-icon" id="iconCard4"><i class="fas fa-boxes-packing"></i></div>
+            </div>
+            <div class="stat-card-value" id="cardTotalParcels">0</div>
+          </div>
+          <!-- 5. Card 5 -->
+          <div class="stat-card-pro">
+            <div class="stat-card-header">
+              <span class="stat-card-label" id="lblCard5">Today's Parcels</span>
+              <div class="stat-card-icon" id="iconCard5"><i class="fas fa-calendar-day"></i></div>
+            </div>
+            <div class="stat-card-value" id="cardTodayParcels">0</div>
+          </div>
+          <!-- 6. Card 6 -->
+          <div class="stat-card-pro">
+            <div class="stat-card-header">
+              <span class="stat-card-label" id="lblCard6">Pending Parcels</span>
+              <div class="stat-card-icon" id="iconCard6" style="background:#fef3c7; color:#b45309;"><i class="fas fa-hourglass-half"></i></div>
+            </div>
+            <div class="stat-card-value" id="cardPendingParcels">0</div>
+          </div>
+          <!-- 7. Card 7 -->
+          <div class="stat-card-pro">
+            <div class="stat-card-header">
+              <span class="stat-card-label" id="lblCard7">Delivered Parcels</span>
+              <div class="stat-card-icon" id="iconCard7" style="background:#dcfce7; color:#15803d;"><i class="fas fa-truck-ramp-box"></i></div>
+            </div>
+            <div class="stat-card-value" id="cardDeliveredParcels">0</div>
+          </div>
+          <!-- 8. Card 8 -->
+          <div class="stat-card-pro">
+            <div class="stat-card-header">
+              <span class="stat-card-label" id="lblCard8">Total Customers</span>
+              <div class="stat-card-icon" id="iconCard8"><i class="fas fa-users"></i></div>
+            </div>
+            <div class="stat-card-value" id="cardTotalCustomers">0</div>
+          </div>
+        </div>
+
+        <!-- SELECTED OFFICE LIVE OVERVIEW CARD (Shown when a specific office is filtered) -->
+        <div class="pro-card" id="selectedOfficeLivePanel" style="display: none; border: 2px solid var(--primary); background: #ffffff;">
+          <div class="pro-card-header">
+            <div>
+              <div class="pro-card-title" id="liveOfficeCardTitle"><i class="fas fa-building" style="color:var(--primary);"></i> Office Live Operations</div>
+              <p style="font-size:0.84rem; color:var(--text-muted);" id="liveOfficeCardSubtitle">Live consignments and local operations for this branch</p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+              <button class="btn-primary btn-sm" onclick="openCurrentlyFilteredOffice()"><i class="fas fa-external-link-alt"></i> Open Full Office Dashboard</button>
+              <button class="btn-secondary btn-sm" onclick="resetLiveOfficeFilter()"><i class="fas fa-globe"></i> View All Offices</button>
+            </div>
+          </div>
+
+          <!-- Office Info Pills -->
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; background: #f8fafc; padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-bottom: 20px;" id="liveOfficeInfoPills">
+            <div><span style="font-size:0.72rem; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Address</span><div style="font-size:0.86rem; font-weight:700;" id="liveOfficePillAddress">-</div></div>
+            <div><span style="font-size:0.72rem; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Contact Phone</span><div style="font-size:0.86rem; font-weight:700;" id="liveOfficePillPhone">-</div></div>
+            <div><span style="font-size:0.72rem; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Branch Manager</span><div style="font-size:0.86rem; font-weight:700;" id="liveOfficePillManager">-</div></div>
+            <div><span style="font-size:0.72rem; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Gross Revenue</span><div style="font-size:0.86rem; font-weight:800; color:var(--primary);" id="liveOfficePillRevenue">₹0</div></div>
+          </div>
+
+          <!-- Office Recent Bills Table -->
+          <div class="pro-card-title" style="font-size: 0.95rem; margin-bottom: 12px;"><i class="fas fa-file-invoice" style="color:var(--primary);"></i> Live Parcels & Bills for this Office</div>
+          <div class="table-responsive">
+            <table class="pro-table">
+              <thead>
+                <tr>
+                  <th>Bill #</th>
+                  <th>Date</th>
+                  <th>Driver & Bus</th>
+                  <th>Sender</th>
+                  <th>Receiver</th>
+                  <th>Total</th>
+                  <th>Jama / Baki</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="liveOfficeBillsTableBody">
+                <tr><td colspan="8" style="text-align:center;">Loading office parcels...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- OFFICES DIRECTORY TABLE -->
+        <div class="pro-card" id="mainDashboardOfficesDirectoryCard">
+          <div class="pro-card-header">
+            <div class="pro-card-title"><i class="fas fa-city" style="color:var(--primary);"></i> Offices Directory & Live Control</div>
+            <div class="table-search-bar">
+              <i class="fas fa-search" style="color:#94a3b8;"></i>
+              <input type="text" id="dashboardOfficeSearch" placeholder="Search office name, code, city..." oninput="filterDashboardOffices()">
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="pro-table">
+              <thead>
+                <tr>
+                  <th>Office Name</th>
+                  <th>Office Code</th>
+                  <th>Location</th>
+                  <th>Manager / Admin</th>
+                  <th>Parcels</th>
+                  <th>Status</th>
+                  <th>Created Date</th>
+                  <th>Live Action</th>
+                </tr>
+              </thead>
+              <tbody id="dashboardOfficesTableBody">
+                <tr><td colspan="8" style="text-align:center; padding:30px;"><i class="fas fa-spinner fa-spin"></i> Loading offices...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- VIEW 2: ALL OFFICES LIST                        -->
+      <!-- ============================================== -->
+      <section class="view-panel" id="view-offices">
+        <div class="page-header-row">
+          <div class="page-header-left">
+            <h2><i class="fas fa-building" style="color:var(--primary);"></i> Office Management — All Offices</h2>
+            <p>Manage, inspect, and drill into all branch locations and transport hubs</p>
+          </div>
+          <div class="header-actions">
+            <a class="btn-primary" data-view="add-office"><i class="fas fa-plus"></i> Add New Office</a>
+          </div>
+        </div>
+
+        <div class="pro-card">
+          <div class="pro-card-header">
+            <div class="pro-card-title"><i class="fas fa-list"></i> Registered Offices</div>
+            <div class="table-search-bar">
+              <i class="fas fa-search" style="color:#94a3b8;"></i>
+              <input type="text" id="allOfficesSearch" placeholder="Filter offices..." oninput="filterAllOfficesTable()">
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="pro-table">
+              <thead>
+                <tr>
+                  <th>Office Name</th>
+                  <th>Code</th>
+                  <th>City / State</th>
+                  <th>Manager</th>
+                  <th>Contact Info</th>
+                  <th>Parcels</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="allOfficesTableBody">
+                <tr><td colspan="8" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- VIEW 3: STEP-BY-STEP ADD NEW OFFICE WIZARD     -->
+      <!-- ============================================== -->
+      <section class="view-panel" id="view-add-office">
+        <div class="page-header-row">
+          <div class="page-header-left">
+            <h2 id="officeWizardTitle"><i class="fas fa-plus-circle" style="color:var(--primary);"></i> Create New Office</h2>
+            <p>Step-by-step workflow: Create Office → Create Office Admin → Generate Login Credentials</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn-back" data-view="offices"><i class="fas fa-arrow-left"></i> Cancel & Back</button>
+          </div>
+        </div>
+
+        <div class="wizard-container">
+          <!-- Stepper Nodes -->
+          <div class="wizard-steps">
+            <div class="wizard-step-node active" id="stepNode1">
+              <div class="step-circle">1</div>
+              <span class="step-text">Office Details</span>
+            </div>
+            <div class="wizard-step-node" id="stepNode2">
+              <div class="step-circle">2</div>
+              <span class="step-text">Create Admin</span>
+            </div>
+            <div class="wizard-step-node" id="stepNode3">
+              <div class="step-circle">3</div>
+              <span class="step-text">Login Credentials</span>
+            </div>
+          </div>
+
+          <!-- STEP 1: OFFICE DETAILS FORM -->
+          <div class="pro-card" id="wizardStep1Card">
+            <div class="pro-card-header">
+              <div class="pro-card-title"><i class="fas fa-building" style="color:var(--primary);"></i> Step 1: Office Details</div>
+              <span style="font-size:0.8rem; color:var(--text-muted);"><span class="req">*</span> Required fields</span>
+            </div>
+
+            <form id="createOfficeForm" onsubmit="handleCreateOfficeSubmit(event)">
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label>Office Name <span class="req">*</span></label>
+                  <input type="text" class="form-control" id="newOfficeName" placeholder="e.g. Rajkot Main Office" required oninput="autoSuggestOfficeCode()">
+                </div>
+                <div class="form-group">
+                  <label>Office Code <span class="req">*</span></label>
+                  <div class="input-with-action">
+                    <input type="text" class="form-control" id="newOfficeCode" placeholder="e.g. OFF-RJK-001" required>
+                    <button type="button" class="btn-secondary btn-sm" onclick="generateRandomOfficeCode()" title="Auto Generate Code"><i class="fas fa-wand-magic-sparkles"></i></button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-grid-3">
+                <div class="form-group">
+                  <label>Office Type</label>
+                  <select class="form-control" id="newOfficeType">
+                    <option value="Main Hub">Main Hub</option>
+                    <option value="Regional Branch" selected>Regional Branch</option>
+                    <option value="Booking Center">Booking Center</option>
+                    <option value="Warehouse / Depot">Warehouse / Depot</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>City <span class="req">*</span></label>
+                  <input type="text" class="form-control" id="newOfficeCity" placeholder="e.g. Rajkot" required>
+                </div>
+                <div class="form-group">
+                  <label>State</label>
+                  <input type="text" class="form-control" id="newOfficeState" placeholder="Gujarat">
+                </div>
+              </div>
+
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label>Address <span class="req">*</span></label>
+                  <input type="text" class="form-control" id="newOfficeAddress" placeholder="Full street address / landmark" required>
+                </div>
+                <div class="form-group">
+                  <label>Pincode</label>
+                  <input type="text" class="form-control" id="newOfficePincode" placeholder="e.g. 360004">
+                </div>
+              </div>
+
+              <div class="form-grid-3">
+                <div class="form-group">
+                  <label>Phone Number</label>
+                  <input type="text" class="form-control" id="newOfficePhone" placeholder="e.g. +91 83201 48345">
+                </div>
+                <div class="form-group">
+                  <label>Email</label>
+                  <input type="email" class="form-control" id="newOfficeEmail" placeholder="e.g. rajkot@example.com">
+                </div>
+                <div class="form-group">
+                  <label>Manager Name</label>
+                  <input type="text" class="form-control" id="newOfficeManager" placeholder="e.g. Bhanji Bhai">
+                </div>
+              </div>
+
+              <div class="form-grid-3">
+                <div class="form-group">
+                  <label>Opening Time</label>
+                  <input type="text" class="form-control" id="newOfficeOpeningTime" placeholder="08:00 AM">
+                </div>
+                <div class="form-group">
+                  <label>Closing Time</label>
+                  <input type="text" class="form-control" id="newOfficeClosingTime" placeholder="09:00 PM">
+                </div>
+                <div class="form-group">
+                  <label>Status</label>
+                  <select class="form-control" id="newOfficeStatus">
+                    <option value="Active" selected>Active</option>
+                    <option value="Inactive">Inactive</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:16px;">
+                <button type="button" class="btn-secondary" data-view="offices">Cancel</button>
+                <button type="submit" class="btn-primary" id="btnSubmitOfficeStep1"><i class="fas fa-arrow-right"></i> Create Office & Continue</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- STEP 2: CREATE OFFICE ADMIN FORM (Auto-displayed after Step 1) -->
+          <div class="pro-card" id="wizardStep2Card" style="display:none;">
+            <div class="success-callout-banner">
+              <i class="fas fa-check-circle"></i>
+              <div>
+                <h4 id="step2SuccessOfficeTitle">Office Created Successfully</h4>
+                <p id="step2SuccessOfficeSub">Rajkot Main Office (OFF-RJK-001) is ready. Now create the Office Admin credentials.</p>
+              </div>
+            </div>
+
+            <div class="pro-card-header">
+              <div class="pro-card-title"><i class="fas fa-user-shield" style="color:var(--primary);"></i> Step 2: Create Office Admin</div>
+              <button type="button" class="btn-secondary btn-sm" onclick="generateCredentialsForStep2()" style="background:#fef3c7; color:#92400e; border-color:#fde68a;">
+                <i class="fas fa-bolt"></i> ⚡ Generate Login Credentials
+              </button>
+            </div>
+
+            <form id="createAdminForm" onsubmit="handleCreateAdminSubmit(event)">
+              <!-- Pre-filled & Locked Office -->
+              <div class="form-group">
+                <label>Office (Pre-selected & Locked)</label>
+                <input type="text" class="form-control" id="step2OfficeDisplay" readonly style="font-weight:700; color:var(--primary);">
+                <input type="hidden" id="step2OfficeId">
+              </div>
+
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label>Admin Name <span class="req">*</span></label>
+                  <input type="text" class="form-control" id="newAdminName" placeholder="e.g. Rajkot Office Admin" required>
+                </div>
+                <div class="form-group">
+                  <label>Username <span class="req">*</span></label>
+                  <input type="text" class="form-control" id="newAdminUsername" placeholder="e.g. rajkot_admin" required onblur="validateUsernameUniqueness(this.value)">
+                  <span id="usernameStatusHint" style="font-size:0.75rem; margin-top:2px;"></span>
+                </div>
+              </div>
+
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label>Email <span class="req">*</span></label>
+                  <input type="email" class="form-control" id="newAdminEmail" placeholder="e.g. rajkotadmin@veronic.com" required>
+                </div>
+                <div class="form-group">
+                  <label>Phone</label>
+                  <input type="text" class="form-control" id="newAdminPhone" placeholder="e.g. +91 98765 43210">
+                </div>
+              </div>
+
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label>Password <span class="req">*</span></label>
+                  <input type="text" class="form-control" id="newAdminPassword" placeholder="Enter or auto-generate" required style="font-family:monospace; font-weight:700;">
+                </div>
+                <div class="form-group">
+                  <label>Confirm Password <span class="req">*</span></label>
+                  <input type="text" class="form-control" id="newAdminConfirmPassword" placeholder="Confirm password" required style="font-family:monospace; font-weight:700;">
+                </div>
+              </div>
+
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label>Role</label>
+                  <select class="form-control" id="newAdminRole">
+                    <option value="sub_admin" selected>Office Admin (Standard)</option>
+                    <option value="office_manager">Office Manager</option>
+                    <option value="staff">Branch Staff</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Status</label>
+                  <select class="form-control" id="newAdminStatus">
+                    <option value="Active" selected>Active</option>
+                    <option value="Inactive">Inactive</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px;">
+                <button type="button" class="btn-secondary" onclick="skipAdminCreation()"><i class="fas fa-forward"></i> Skip Admin Creation</button>
+                <button type="submit" class="btn-primary" id="btnSubmitAdminStep2"><i class="fas fa-check"></i> Create Admin & Generate Login →</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- STEP 3: LOGIN CREDENTIAL CONFIRMATION SCREEN -->
+          <div class="confirmation-box" id="wizardStep3Card" style="display:none;">
+            <div class="conf-header">
+              <div class="check-circle"><i class="fas fa-check"></i></div>
+              <h3>✓ Office & Admin Created Successfully</h3>
+              <p style="color:var(--text-muted); font-size:0.86rem; margin-top:4px;">The office and its designated administrator are now live in the system.</p>
+            </div>
+
+            <!-- Credentials Card -->
+            <div class="credentials-alert-card">
+              <div class="cred-title"><i class="fas fa-key"></i> Administrator Login Credentials</div>
+              <div class="cred-grid">
+                <div class="cred-item">
+                  <div class="k">Username / Login ID</div>
+                  <div class="v" id="confDisplayUsername">rajkot_admin</div>
+                </div>
+                <div class="cred-item">
+                  <div class="k">Password</div>
+                  <div class="v" id="confDisplayPassword">••••••••</div>
+                </div>
+              </div>
+
+              <div class="copy-buttons-row">
+                <button class="btn-copy" onclick="copyText('confDisplayUsername', 'Username copied!')"><i class="fas fa-copy"></i> Copy Username</button>
+                <button class="btn-copy" onclick="copyPasswordValue()"><i class="fas fa-key"></i> Copy Password</button>
+                <button class="btn-copy" onclick="copyFullLoginDetails()"><i class="fas fa-clipboard-list"></i> Copy Login Details</button>
+              </div>
+            </div>
+
+            <!-- Summary Breakdown -->
+            <div class="conf-details-grid">
+              <!-- Office Summary -->
+              <div class="conf-sub-card">
+                <div class="conf-sub-title"><i class="fas fa-building"></i> Office Summary</div>
+                <div class="conf-row"><span class="label">Office Name:</span><span class="val" id="confOfficeName">-</span></div>
+                <div class="conf-row"><span class="label">Office Code:</span><span class="val" id="confOfficeCode">-</span></div>
+                <div class="conf-row"><span class="label">City / State:</span><span class="val" id="confOfficeCity">-</span></div>
+                <div class="conf-row"><span class="label">Phone:</span><span class="val" id="confOfficePhone">-</span></div>
+              </div>
+
+              <!-- Admin Summary -->
+              <div class="conf-sub-card">
+                <div class="conf-sub-title"><i class="fas fa-user-shield"></i> Admin Details</div>
+                <div class="conf-row"><span class="label">Admin Name:</span><span class="val" id="confAdminName">-</span></div>
+                <div class="conf-row"><span class="label">Email:</span><span class="val" id="confAdminEmail">-</span></div>
+                <div class="conf-row"><span class="label">Role:</span><span class="val" id="confAdminRole">Office Admin</span></div>
+                <div class="conf-row"><span class="label">Status:</span><span class="val" style="color:#059669;">Active</span></div>
+              </div>
+            </div>
+
+            <!-- Final Actions -->
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+              <button class="btn-secondary" onclick="resetWizardAndGoOffices()"><i class="fas fa-list"></i> Done / View All Offices</button>
+              <button class="btn-primary" id="btnConfOpenOffice"><i class="fas fa-external-link-alt"></i> Open Office Dashboard</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- VIEW 4: ADMIN MANAGEMENT                        -->
+      <!-- ============================================== -->
+      <section class="view-panel" id="view-admins">
+        <div class="page-header-row">
+          <div class="page-header-left">
+            <h2><i class="fas fa-user-shield" style="color:var(--primary);"></i> Admin Management</h2>
+            <p>Manage Super Admins, Branch Sub-Admins, credentials, and granular operational permissions</p>
+          </div>
+          <div class="header-actions">
+            <a class="btn-primary" data-view="create-admin"><i class="fas fa-user-plus"></i> + Create Admin</a>
+          </div>
+        </div>
+
+        <div class="pro-card">
+          <div class="pro-card-header">
+            <div class="pro-card-title"><i class="fas fa-users-gear"></i> System Administrators</div>
+            <div class="table-search-bar">
+              <i class="fas fa-search" style="color:#94a3b8;"></i>
+              <input type="text" id="adminTableSearch" placeholder="Search admin name, username, office..." oninput="filterAdminsTable()">
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="pro-table">
+              <thead>
+                <tr>
+                  <th>Admin Name</th>
+                  <th>Username</th>
+                  <th>Email</th>
+                  <th>Password</th>
+                  <th>Assigned Office</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                  <th>Last Login</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="adminsTableBody">
+                <tr><td colspan="9" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Loading admins...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- VIEW 5: CREATE ADMIN FOR EXISTING OFFICE       -->
+      <!-- ============================================== -->
+      <section class="view-panel" id="view-create-admin">
+        <div class="page-header-row">
+          <div class="page-header-left">
+            <h2><i class="fas fa-user-plus" style="color:var(--primary);"></i> Create Office Admin</h2>
+            <p>Assign a new administrator or manager to an existing branch office</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn-back" data-view="admins"><i class="fas fa-arrow-left"></i> Back to Admins</button>
+          </div>
+        </div>
+
+        <div class="wizard-container">
+          <div class="pro-card">
+            <div class="pro-card-header">
+              <div class="pro-card-title"><i class="fas fa-shield-halved" style="color:var(--primary);"></i> Administrator Details</div>
+              <button type="button" class="btn-secondary btn-sm" onclick="generateCredentialsForStandaloneAdmin()" style="background:#fef3c7; color:#92400e; border-color:#fde68a;">
+                <i class="fas fa-bolt"></i> ⚡ Generate Login Credentials
+              </button>
+            </div>
+
+            <form id="standaloneCreateAdminForm" onsubmit="handleStandaloneAdminSubmit(event)">
+              <div class="form-group">
+                <label>Select Office <span class="req">*</span></label>
+                <select class="form-control" id="standaloneAdminOfficeSelect" required>
+                  <option value="">-- Choose Branch Office --</option>
+                </select>
+              </div>
+
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label>Admin Name <span class="req">*</span></label>
+                  <input type="text" class="form-control" id="saAdminName" placeholder="e.g. Ramesh Patel" required>
+                </div>
+                <div class="form-group">
+                  <label>Username <span class="req">*</span></label>
+                  <input type="text" class="form-control" id="saAdminUsername" placeholder="e.g. ramesh_surat" required>
+                </div>
+              </div>
+
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label>Email <span class="req">*</span></label>
+                  <input type="email" class="form-control" id="saAdminEmail" placeholder="e.g. ramesh@veronic.com" required>
+                </div>
+                <div class="form-group">
+                  <label>Phone</label>
+                  <input type="text" class="form-control" id="saAdminPhone" placeholder="e.g. +91 98250 11223">
+                </div>
+              </div>
+
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label>Password <span class="req">*</span></label>
+                  <input type="text" class="form-control" id="saAdminPassword" placeholder="Password" required style="font-family:monospace; font-weight:700;">
+                </div>
+                <div class="form-group">
+                  <label>Confirm Password <span class="req">*</span></label>
+                  <input type="text" class="form-control" id="saAdminConfirmPassword" placeholder="Confirm Password" required style="font-family:monospace; font-weight:700;">
+                </div>
+              </div>
+
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label>Role</label>
+                  <select class="form-control" id="saAdminRole">
+                    <option value="sub_admin" selected>Office Admin</option>
+                    <option value="office_manager">Office Manager</option>
+                    <option value="staff">Staff Member</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Status</label>
+                  <select class="form-control" id="saAdminStatus">
+                    <option value="Active" selected>Active</option>
+                    <option value="Inactive">Inactive</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:20px;">
+                <button type="button" class="btn-secondary" data-view="admins">Cancel</button>
+                <button type="submit" class="btn-primary"><i class="fas fa-user-check"></i> Save & Create Admin</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- VIEW 6: SELECTED OFFICE DRILLDOWN DASHBOARD    -->
+      <!-- ============================================== -->
+      <section class="view-panel" id="view-office-drilldown">
+        <div class="page-header-row">
+          <div class="page-header-left">
+            <div style="margin-bottom:6px;">
+              <button class="btn-back" id="drilldownBackBtn" onclick="returnToAllOffices()"><i class="fas fa-arrow-left"></i> ← Back to All Offices</button>
+            </div>
+            <h2 id="drilldownOfficeTitle">Rajkot Central Office <span class="role-tag sub-admin" id="drilldownOfficeCode">OFF-001</span></h2>
+            <p id="drilldownOfficeSubtitle">Dedicated branch operations, parcel tracking, fleet dispatch, and local staff</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn-secondary btn-sm" onclick="reloadCurrentDrilldown()"><i class="fas fa-rotate"></i> Refresh</button>
+          </div>
+        </div>
+
+        <!-- Scoped Metrics (8 Cards) -->
+        <div class="stats-8-grid">
+          <div class="stat-card-pro">
+            <div class="stat-card-header"><span class="stat-card-label">Total Parcels</span><div class="stat-card-icon"><i class="fas fa-boxes-packing"></i></div></div>
+            <div class="stat-card-value" id="drillMetricParcels">0</div>
+          </div>
+          <div class="stat-card-pro">
+            <div class="stat-card-header"><span class="stat-card-label">Today's Parcels</span><div class="stat-card-icon"><i class="fas fa-calendar-day"></i></div></div>
+            <div class="stat-card-value" id="drillMetricToday">0</div>
+          </div>
+          <div class="stat-card-pro">
+            <div class="stat-card-header"><span class="stat-card-label">Pending</span><div class="stat-card-icon" style="background:#fef3c7; color:#b45309;"><i class="fas fa-hourglass-half"></i></div></div>
+            <div class="stat-card-value" id="drillMetricPending">0</div>
+          </div>
+          <div class="stat-card-pro">
+            <div class="stat-card-header"><span class="stat-card-label">In Transit</span><div class="stat-card-icon" style="background:#e0f2fe; color:#0369a1;"><i class="fas fa-truck-fast"></i></div></div>
+            <div class="stat-card-value" id="drillMetricInTransit">0</div>
+          </div>
+          <div class="stat-card-pro">
+            <div class="stat-card-header"><span class="stat-card-label">Delivered</span><div class="stat-card-icon" style="background:#dcfce7; color:#15803d;"><i class="fas fa-check-circle"></i></div></div>
+            <div class="stat-card-value" id="drillMetricDelivered">0</div>
+          </div>
+          <div class="stat-card-pro">
+            <div class="stat-card-header"><span class="stat-card-label">Customers</span><div class="stat-card-icon"><i class="fas fa-users"></i></div></div>
+            <div class="stat-card-value" id="drillMetricCustomers">0</div>
+          </div>
+          <div class="stat-card-pro">
+            <div class="stat-card-header"><span class="stat-card-label">Drivers</span><div class="stat-card-icon"><i class="fas fa-id-card"></i></div></div>
+            <div class="stat-card-value" id="drillMetricDrivers">0</div>
+          </div>
+          <div class="stat-card-pro">
+            <div class="stat-card-header"><span class="stat-card-label">Revenue (₹)</span><div class="stat-card-icon" style="background:#dcfce7; color:#15803d;"><i class="fas fa-indian-rupee-sign"></i></div></div>
+            <div class="stat-card-value" id="drillMetricRevenue">₹0</div>
+          </div>
+        </div>
+
+        <!-- Drilldown Sub-Views / Tabs -->
+        <div class="drilldown-tabs-header">
+          <button class="drill-tab-btn active" data-tab="parcels"><i class="fas fa-boxes-packing"></i> Parcels & Billing</button>
+          <button class="drill-tab-btn" data-tab="drivers"><i class="fas fa-truck"></i> Drivers & Fleet</button>
+          <button class="drill-tab-btn" data-tab="staff"><i class="fas fa-user-tie"></i> Assigned Staff & Admins</button>
+        </div>
+
+        <!-- Tab 1: Parcels -->
+        <div class="drill-tab-content active" id="drillTabParcels">
+          <div class="pro-card">
+            <div class="pro-card-header">
+              <div class="pro-card-title"><i class="fas fa-file-invoice" style="color:var(--primary);"></i> Office Parcels & Bills</div>
+              <div class="table-search-bar">
+                <i class="fas fa-search" style="color:#94a3b8;"></i>
+                <input type="text" placeholder="Search bill no, sender, receiver..." oninput="filterDrillBills(this.value)">
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="pro-table">
+                <thead>
+                  <tr>
+                    <th>Bill No</th>
+                    <th>Date</th>
+                    <th>Driver & Bus</th>
+                    <th>Sender</th>
+                    <th>Receiver</th>
+                    <th>Total</th>
+                    <th>Jama / Baki</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="drillBillsTableBody">
+                  <tr><td colspan="8" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Loading parcels...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 2: Drivers -->
+        <div class="drill-tab-content" id="drillTabDrivers" style="display:none;">
+          <div class="pro-card">
+            <div class="pro-card-header">
+              <div class="pro-card-title"><i class="fas fa-truck-moving" style="color:var(--primary);"></i> Assigned Fleet Drivers</div>
+            </div>
+            <div class="table-responsive">
+              <table class="pro-table">
+                <thead>
+                  <tr>
+                    <th>Driver Name</th>
+                    <th>Mobile</th>
+                    <th>License No</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="drillDriversTableBody">
+                  <tr><td colspan="4" style="text-align:center;">Loading drivers...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 3: Staff -->
+        <div class="drill-tab-content" id="drillTabStaff" style="display:none;">
+          <div class="pro-card">
+            <div class="pro-card-header">
+              <div class="pro-card-title"><i class="fas fa-user-group" style="color:var(--primary);"></i> Branch Administrators & Staff</div>
+            </div>
+            <div class="table-responsive">
+              <table class="pro-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Last Login</th>
+                  </tr>
+                </thead>
+                <tbody id="drillStaffTableBody">
+                  <tr><td colspan="6" style="text-align:center;">Loading staff...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- VIEW 7: USERS & MEMBERS DIRECTORY               -->
+      <!-- ============================================== -->
+      <section class="view-panel" id="view-users">
+        <div class="page-header-row">
+          <div class="page-header-left">
+            <h2><i class="fas fa-users" style="color:var(--primary);"></i> Registered System Users & Members</h2>
+            <p>Manage branch members, operators, booking agents, and user credentials</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn-secondary btn-sm" onclick="loadUsers()"><i class="fas fa-rotate"></i> Refresh</button>
+            <button class="btn-primary" onclick="openAddMemberModal()"><i class="fas fa-user-plus"></i> + Add Member / User</button>
+          </div>
+        </div>
+
+        <div class="pro-card">
+          <div class="table-responsive">
+            <table class="pro-table">
+              <thead>
+                <tr>
+                  <th># ID</th>
+                  <th>Full Name</th>
+                  <th>Email / Username</th>
+                  <th>Password</th>
+                  <th>Office Name</th>
+                  <th>Office Place / City</th>
+                  <th>Role</th>
+                  <th>Registered Date</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="usersTableBody">
+                <tr><td colspan="10" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Loading users...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- VIEW 8: GLOBAL PARCELS                          -->
+      <!-- ============================================== -->
+      <section class="view-panel" id="view-parcels">
+        <div class="page-header-row">
+          <div class="page-header-left">
+            <h2><i class="fas fa-boxes-packing" style="color:var(--primary);"></i> Parcels & Consignments</h2>
+            <p>Master ledger of all consignments dispatched across all transport corridors</p>
+          </div>
+        </div>
+
+        <div class="pro-card">
+          <div class="table-responsive">
+            <table class="pro-table">
+              <thead>
+                <tr>
+                  <th>Bill #</th>
+                  <th>Date</th>
+                  <th>Origin → Destination</th>
+                  <th>Sender</th>
+                  <th>Receiver</th>
+                  <th>Qty</th>
+                  <th>Amount</th>
+                  <th>Payment</th>
+                </tr>
+              </thead>
+              <tbody id="globalParcelsTableBody">
+                <tr><td colspan="8" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Loading parcels...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- VIEW 9: REPORTS                                 -->
+      <!-- ============================================== -->
+      <section class="view-panel" id="view-reports">
+        <div class="page-header-row">
+          <div class="page-header-left">
+            <h2><i class="fas fa-chart-line" style="color:var(--primary);"></i> Analytics & Reports</h2>
+            <p>Monthly billing breakdown, branch performance, and parcel volumes</p>
+          </div>
+        </div>
+
+        <div class="pro-card">
+          <div class="pro-card-title" style="margin-bottom:16px;"><i class="fas fa-chart-simple"></i> Monthly Revenue Overview</div>
+          <div class="table-responsive">
+            <table class="pro-table">
+              <thead>
+                <tr>
+                  <th>Month</th>
+                  <th>Total Consignments / Bills</th>
+                  <th>Gross Revenue (₹)</th>
+                </tr>
+              </thead>
+              <tbody id="reportsTableBody">
+                <tr><td colspan="3" style="text-align:center;">Loading analytics...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- VIEW 10: ACTIVITY LOGS                         -->
+      <!-- ============================================== -->
+      <section class="view-panel" id="view-activity-logs">
+        <div class="page-header-row">
+          <div class="page-header-left">
+            <h2><i class="fas fa-clock-rotate-left" style="color:var(--primary);"></i> Security & Activity Audit Trail</h2>
+            <p>Real-time audit log of administrative actions, logins, and branch modifications</p>
+          </div>
+        </div>
+
+        <div class="pro-card">
+          <div class="table-responsive">
+            <table class="pro-table">
+              <thead>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>Admin User</th>
+                  <th>Action</th>
+                  <th>Details</th>
+                  <th>IP Address</th>
+                </tr>
+              </thead>
+              <tbody id="activityLogsTableBody">
+                <tr><td colspan="5" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Loading audit trail...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- VIEW 11: SETTINGS                               -->
+      <!-- ============================================== -->
+      <section class="view-panel" id="view-settings">
+        <div class="page-header-row">
+          <div class="page-header-left">
+            <h2><i class="fas fa-cog" style="color:var(--primary);"></i> System Settings</h2>
+            <p>Enterprise configuration, company details, and preferences</p>
+          </div>
+        </div>
+
+        <div class="pro-card" style="max-width:720px;">
+          <div class="pro-card-title" style="margin-bottom:16px;"><i class="fas fa-sliders"></i> Enterprise Preferences</div>
+          <div class="form-group">
+            <label>Company Legal Name</label>
+            <input type="text" class="form-control" value="NEW VERONIC TRAVELS (ભાણજી)" readonly>
+          </div>
+          <div class="form-group">
+            <label>Corridor Subtitle</label>
+            <input type="text" class="form-control" value="Rajkot – Surat Transport Service" readonly>
+          </div>
+          <div class="form-group">
+            <label>Database Engine</label>
+            <input type="text" class="form-control" value="SQLite3 (veronic_fleet.db)" readonly>
+          </div>
+          <div class="form-group">
+            <label>Application Version</label>
+            <input type="text" class="form-control" value="Veronic Enterprise Multi-Office v2.5.0" readonly>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- RESET ADMIN PASSWORD MODAL -->
+  <div class="modal-overlay" id="resetPasswordModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i class="fas fa-key" style="color:var(--primary);"></i> Reset Admin Password</h3>
+        <button class="modal-close-btn" onclick="closeModal('resetPasswordModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="resetAdminId">
+        <div class="form-group">
+          <label>Admin User</label>
+          <input type="text" class="form-control" id="resetAdminNameDisplay" readonly>
+        </div>
+        <div class="form-group">
+          <label>New Password <span class="req">*</span></label>
+          <input type="text" class="form-control" id="resetAdminNewPassword" placeholder="Enter new password" style="font-family:monospace; font-weight:700;">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeModal('resetPasswordModal')">Cancel</button>
+        <button class="btn-primary" onclick="submitResetPassword()"><i class="fas fa-save"></i> Save New Password</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD MEMBER / USER MODAL -->
+  <div class="modal-overlay" id="addMemberModal">
+    <div class="modal-card" style="max-width:550px;">
+      <div class="modal-header">
+        <h3><i class="fas fa-user-plus" style="color:var(--primary);"></i> Add New Member / User</h3>
+        <button class="modal-close-btn" onclick="closeModal('addMemberModal')">×</button>
+      </div>
+      <form id="createMemberForm" onsubmit="submitCreateMemberForm(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Full Name <span class="req">*</span></label>
+            <input type="text" class="form-control" id="newMemberName" placeholder="e.g., Rajesh Kumar" required>
+          </div>
+          <div class="form-group">
+            <label>Email Address / Username <span class="req">*</span></label>
+            <input type="email" class="form-control" id="newMemberEmail" placeholder="e.g., rajesh@dropbook.com" required>
+          </div>
+          <div class="form-group">
+            <label>Assigned Branch Office <span class="req">*</span></label>
+            <select class="form-control" id="newMemberOfficeSelect" required>
+              <option value="">-- Select Branch Office --</option>
+            </select>
+          </div>
+          <div class="form-grid-2" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div class="form-group">
+              <label>Role</label>
+              <select class="form-control" id="newMemberRole">
+                <option value="member" selected>Branch Staff / Operator</option>
+                <option value="booking_agent">Booking Agent</option>
+                <option value="manager">Branch Manager</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Status</label>
+              <select class="form-control" id="newMemberStatus">
+                <option value="Active" selected>Active</option>
+                <option value="Inactive">Inactive</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <label style="margin:0;">Password <span class="req">*</span></label>
+              <button type="button" class="btn-secondary btn-sm" onclick="generateCredentialsForMember()" style="font-size:0.75rem; padding:3px 8px;">
+                <i class="fas fa-wand-magic-sparkles"></i> Auto Generate
+              </button>
+            </div>
+            <input type="text" class="form-control" id="newMemberPassword" placeholder="Enter or auto-generate password" style="font-family:monospace; font-weight:700;" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" onclick="closeModal('addMemberModal')">Cancel</button>
+          <button type="submit" class="btn-primary"><i class="fas fa-check"></i> Create Member</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- RESET USER PASSWORD MODAL -->
+  <div class="modal-overlay" id="resetUserPasswordModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i class="fas fa-key" style="color:var(--primary);"></i> Reset Member Password</h3>
+        <button class="modal-close-btn" onclick="closeModal('resetUserPasswordModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="resetUserId">
+        <div class="form-group">
+          <label>Member Name</label>
+          <input type="text" class="form-control" id="resetUserNameDisplay" readonly>
+        </div>
+        <div class="form-group">
+          <label>New Password <span class="req">*</span></label>
+          <input type="text" class="form-control" id="resetUserNewPassword" placeholder="Enter new password" style="font-family:monospace; font-weight:700;">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeModal('resetUserPasswordModal')">Cancel</button>
+        <button class="btn-primary" onclick="submitResetUserPassword()"><i class="fas fa-save"></i> Save New Password</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATIONS -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- SCRIPTS -->
+  <script>
+    const API_BASE = '/api/admin';
+    let currentAdmin = null;
+    let globalStats = null;
+    let createdOfficeData = null;
+    let createdAdminData = null;
+    let currentDrilldownOfficeId = null;
+
+    // Authentication Guard
+    function getAdminToken() {
+      return localStorage.getItem('veronic_admin_token');
+    }
+
+    function setAdminToken(t) {
+      localStorage.setItem('veronic_admin_token', t);
+    }
+
+    async function apiFetch(endpoint, options = {}) {
+      const token = getAdminToken();
+      const headers = {
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+        ...options.headers
+      };
+      const response = await fetch(`${API_BASE}${endpoint}`, { ...options, headers });
+      if (response.status === 401) {
+        localStorage.removeItem('veronic_admin_token');
+        window.location.href = 'login.html';
+        return null;
+      }
+      return await response.json();
+    }
+
+    function showToast(msg, type = 'success') {
+      const c = document.getElementById('toastContainer');
+      const t = document.createElement('div');
+      t.className = `toast-item ${type}`;
+      t.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${msg}`;
+      c.appendChild(t);
+      setTimeout(() => { t.remove(); }, 3500);
+    }
+
+    function copyText(elementId, successMsg) {
+      const el = document.getElementById(elementId);
+      if (!el) return;
+      navigator.clipboard.writeText(el.textContent.trim()).then(() => {
+        showToast(successMsg || 'Copied to clipboard!');
+      });
+    }
+
+    function copyPasswordValue() {
+      if (createdAdminData && createdAdminData.password) {
+        navigator.clipboard.writeText(createdAdminData.password).then(() => {
+          showToast('Password copied to clipboard!');
+        });
+      }
+    }
+
+    function copyFullLoginDetails() {
+      if (createdOfficeData && createdAdminData) {
+        const text = `=== NEW VERONIC TRAVELS ADMIN CREDENTIALS ===\n` +
+          `Office: ${createdOfficeData.office_name} (${createdOfficeData.office_code})\n` +
+          `Location: ${createdOfficeData.city}\n` +
+          `Admin Name: ${createdAdminData.name}\n` +
+          `Login URL: ${window.location.origin}/admin/login\n` +
+          `Username: ${createdAdminData.username}\n` +
+          `Password: ${createdAdminData.password}\n` +
+          `Role: ${createdAdminData.role}\n` +
+          `==============================================`;
+        navigator.clipboard.writeText(text).then(() => {
+          showToast('Complete login details copied!');
+        });
+      }
+    }
+
+    // Modal helpers
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+    function resetOfficeWizard() {
+      const s1 = document.getElementById('wizardStep1Card');
+      const s2 = document.getElementById('wizardStep2Card');
+      const s3 = document.getElementById('wizardStep3Card');
+      if (s1) s1.style.display = 'block';
+      if (s2) s2.style.display = 'none';
+      if (s3) s3.style.display = 'none';
+
+      const n1 = document.getElementById('stepNode1');
+      const n2 = document.getElementById('stepNode2');
+      const n3 = document.getElementById('stepNode3');
+      if (n1) { n1.className = 'wizard-step-node active'; }
+      if (n2) { n2.className = 'wizard-step-node'; }
+      if (n3) { n3.className = 'wizard-step-node'; }
+
+      const f1 = document.getElementById('createOfficeForm');
+      if (f1) f1.reset();
+      const f2 = document.getElementById('createAdminForm');
+      if (f2) f2.reset();
+      createdOfficeContext = null;
+    }
+
+    // Navigation Switcher
+    function switchView(viewName) {
+      document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+      const target = document.getElementById(`view-${viewName}`);
+      if (target) target.classList.add('active');
+
+      // Update sidebar active classes
+      document.querySelectorAll('.sidebar-item, .sidebar-sub-item, .admin-bottom-item').forEach(el => {
+        el.classList.toggle('active', el.getAttribute('data-view') === viewName);
+      });
+
+      // Trigger view data loaders
+      if (viewName === 'dashboard') loadDashboardData();
+      else if (viewName === 'offices') loadAllOffices();
+      else if (viewName === 'add-office') resetOfficeWizard();
+      else if (viewName === 'admins') loadAdmins();
+      else if (viewName === 'create-admin') loadStandaloneOfficesDropdown();
+      else if (viewName === 'users') loadUsers();
+      else if (viewName === 'parcels') loadParcels();
+      else if (viewName === 'reports') loadReports();
+      else if (viewName === 'activity-logs') loadActivityLogs();
+    }
+
+    // Initialize application
+    async function initApp() {
+      const token = getAdminToken();
+      if (!token) {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      const res = await apiFetch('/verify');
+      if (!res || !res.success) {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      currentAdmin = res.data.admin;
+      updateAdminProfileUI(currentAdmin);
+
+      // Handle Role Restrictions
+      if (currentAdmin.role === 'sub_admin') {
+        // Office Admin Mode
+        document.getElementById('headerRoleBadge').className = 'role-tag sub-admin';
+        document.getElementById('headerRoleBadge').textContent = 'OFFICE ADMIN';
+        document.getElementById('navbarMainTitle').innerHTML = `${currentAdmin.office_name} <span class="role-tag sub-admin">${currentAdmin.office_code}</span>`;
+        document.getElementById('officeMgmtSection').style.display = 'none';
+        document.getElementById('officeMgmtMenu').style.display = 'none';
+        document.getElementById('adminMgmtSection').style.display = 'none';
+        document.getElementById('adminMgmtMenu').style.display = 'none';
+
+        // Auto drill-down to assigned office
+        openOfficeDrilldown(currentAdmin.office_id, currentAdmin.office_name, currentAdmin.office_code);
+        document.getElementById('drilldownBackBtn').style.display = 'none';
+      } else {
+        // Main Admin Mode
+        loadDashboardData();
+      }
+
+      setupEventListeners();
+    }
+
+    function updateAdminProfileUI(admin) {
+      const name = admin.name || 'Admin';
+      const role = admin.role === 'main_admin' ? 'Super Administrator' : (admin.office_name || 'Office Admin');
+      const letter = name.charAt(0).toUpperCase();
+      const office = admin.role === 'main_admin' ? 'All Offices (Systemwide)' : `${admin.office_name} (${admin.office_code})`;
+
+      const navName = document.getElementById('navAdminName');
+      if (navName) navName.textContent = name;
+      const navRole = document.getElementById('navAdminRole');
+      if (navRole) navRole.textContent = role;
+      const navAvatar = document.getElementById('userAvatarLetter');
+      if (navAvatar) navAvatar.textContent = letter;
+      const navOffice = document.getElementById('currentOfficeName');
+      if (navOffice) navOffice.textContent = office;
+
+      const sName = document.getElementById('sidebarAdminName');
+      if (sName) sName.textContent = name;
+      const sRole = document.getElementById('sidebarAdminRole');
+      if (sRole) sRole.textContent = role;
+      const sAvatar = document.getElementById('sidebarAvatarLetter');
+      if (sAvatar) sAvatar.textContent = letter;
+      const sOffice = document.getElementById('sidebarOfficeName');
+      if (sOffice) sOffice.textContent = office;
+    }
+
+    function setupEventListeners() {
+      // Sidebar click delegation
+      document.addEventListener('click', (e) => {
+        const link = e.target.closest('[data-view]');
+        if (link) {
+          e.preventDefault();
+          const view = link.getAttribute('data-view');
+          if (view) switchView(view);
+        }
+      });
+
+      // Drilldown tabs
+      document.querySelectorAll('.drill-tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.drill-tab-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const tab = btn.getAttribute('data-tab');
+          document.getElementById('drillTabParcels').style.display = tab === 'parcels' ? 'block' : 'none';
+          document.getElementById('drillTabDrivers').style.display = tab === 'drivers' ? 'block' : 'none';
+          document.getElementById('drillTabStaff').style.display = tab === 'staff' ? 'block' : 'none';
+        });
+      });
+
+      // Logout
+      const handleLogout = async () => {
+        await apiFetch('/logout', { method: 'POST' });
+        localStorage.removeItem('veronic_admin_token');
+        window.location.href = 'login.html';
+      };
+      document.getElementById('adminLogoutBtn').addEventListener('click', handleLogout);
+      document.getElementById('sidebarLogoutBtn')?.addEventListener('click', handleLogout);
+
+      // Mobile Navigation Drawer Handlers
+      function openAdminMobileMenu() {
+        const sidebar = document.getElementById('mainAdminSidebar');
+        const backdrop = document.getElementById('adminSidebarBackdrop');
+        if (sidebar) sidebar.classList.add('mobile-open');
+        if (backdrop) backdrop.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeAdminMobileMenu() {
+        const sidebar = document.getElementById('mainAdminSidebar');
+        const backdrop = document.getElementById('adminSidebarBackdrop');
+        if (sidebar) sidebar.classList.remove('mobile-open');
+        if (backdrop) backdrop.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+
+      function toggleAdminMobileMenu() {
+        const sidebar = document.getElementById('mainAdminSidebar');
+        if (sidebar && sidebar.classList.contains('mobile-open')) {
+          closeAdminMobileMenu();
+        } else {
+          openAdminMobileMenu();
+        }
+      }
+
+      document.getElementById('adminMobileMenuBtn')?.addEventListener('click', toggleAdminMobileMenu);
+      document.getElementById('sidebarMobileCloseBtn')?.addEventListener('click', closeAdminMobileMenu);
+      document.getElementById('adminSidebarBackdrop')?.addEventListener('click', closeAdminMobileMenu);
+
+      // Auto close mobile drawer when any sidebar link is clicked
+      document.querySelectorAll('#mainAdminSidebar a[data-view]').forEach(item => {
+        item.addEventListener('click', () => {
+          if (window.innerWidth <= 768) {
+            closeAdminMobileMenu();
+          }
+        });
+      });
+    }
+
+    // ==============================================
+    // 1. DASHBOARD DATA & LIVE OFFICE SWITCHING
+    // ==============================================
+    let currentLiveFilteredOfficeId = 'ALL';
+
+    async function loadDashboardData() {
+      const res = await apiFetch('/stats');
+      if (!res || !res.success) return;
+      globalStats = res.data;
+
+      // Populate office select dropdown
+      const select = document.getElementById('mainDashboardOfficeFilter');
+      if (select) {
+        const currentVal = select.value || 'ALL';
+        select.innerHTML = '<option value="ALL">🌐 All Offices (Systemwide)</option>' +
+          (globalStats.offices || []).map(o => `<option value="${o.id}">🏢 ${o.office_name} (${o.office_code}) - ${o.city}</option>`).join('');
+        select.value = currentVal;
+      }
+
+      if (currentLiveFilteredOfficeId === 'ALL') {
+        renderGlobalDashboardView();
+      } else {
+        handleLiveOfficeFilterChange(currentLiveFilteredOfficeId);
+      }
+    }
+
+    function renderGlobalDashboardView() {
+      currentLiveFilteredOfficeId = 'ALL';
+      const label = document.getElementById('liveSelectedOfficeLabel');
+      if (label) label.innerHTML = '🌐 All Offices (Global Real-Time Overview)';
+      
+      const btnQuick = document.getElementById('btnQuickOpenSelectedOffice');
+      if (btnQuick) btnQuick.style.display = 'none';
+      
+      const btnReset = document.getElementById('btnResetToAllOffices');
+      if (btnReset) btnReset.style.display = 'none';
+      
+      const livePanel = document.getElementById('selectedOfficeLivePanel');
+      if (livePanel) livePanel.style.display = 'none';
+      
+      const dirCard = document.getElementById('mainDashboardOfficesDirectoryCard');
+      if (dirCard) dirCard.style.display = 'block';
+
+      // Restore 8 global labels & icons
+      document.getElementById('lblCard1').textContent = 'Total Offices';
+      document.getElementById('iconCard1').innerHTML = '<i class="fas fa-building"></i>';
+      document.getElementById('cardTotalOffices').textContent = globalStats.totalOffices || 0;
+
+      document.getElementById('lblCard2').textContent = 'Active Offices';
+      document.getElementById('iconCard2').innerHTML = '<i class="fas fa-check-circle"></i>';
+      document.getElementById('cardActiveOffices').textContent = (globalStats.offices || []).filter(o => o.status === 'Active').length;
+
+      document.getElementById('lblCard3').textContent = 'Total Office Admins';
+      document.getElementById('iconCard3').innerHTML = '<i class="fas fa-user-shield"></i>';
+      document.getElementById('cardTotalAdmins').textContent = globalStats.totalStaff || 0;
+
+      document.getElementById('lblCard4').textContent = 'Total Parcels';
+      document.getElementById('iconCard4').innerHTML = '<i class="fas fa-boxes-packing"></i>';
+      document.getElementById('cardTotalParcels').textContent = globalStats.totalParcels || 0;
+
+      document.getElementById('lblCard5').textContent = "Today's Parcels";
+      document.getElementById('iconCard5').innerHTML = '<i class="fas fa-calendar-day"></i>';
+      document.getElementById('cardTodayParcels').textContent = globalStats.todayParcels || 0;
+
+      document.getElementById('lblCard6').textContent = 'Pending Parcels';
+      document.getElementById('iconCard6').innerHTML = '<i class="fas fa-hourglass-half"></i>';
+      document.getElementById('cardPendingParcels').textContent = globalStats.pendingParcels || 0;
+
+      document.getElementById('lblCard7').textContent = 'Delivered Parcels';
+      document.getElementById('iconCard7').innerHTML = '<i class="fas fa-truck-ramp-box"></i>';
+      document.getElementById('cardDeliveredParcels').textContent = globalStats.deliveredParcels || 0;
+
+      document.getElementById('lblCard8').textContent = 'Total Customers';
+      document.getElementById('iconCard8').innerHTML = '<i class="fas fa-users"></i>';
+      document.getElementById('cardTotalCustomers').textContent = globalStats.totalCustomers || 0;
+
+      renderDashboardOfficesTable(globalStats.offices || []);
+    }
+
+    async function handleLiveOfficeFilterChange(officeId) {
+      if (!officeId || officeId === 'ALL') {
+        renderGlobalDashboardView();
+        return;
+      }
+
+      currentLiveFilteredOfficeId = officeId;
+      const select = document.getElementById('mainDashboardOfficeFilter');
+      if (select) select.value = officeId;
+
+      document.getElementById('btnQuickOpenSelectedOffice').style.display = 'inline-flex';
+      document.getElementById('btnResetToAllOffices').style.display = 'inline-flex';
+
+      const res = await apiFetch(`/offices/${officeId}/dashboard`);
+      if (!res || !res.success) return;
+
+      const { office, metrics, recentBills } = res.data;
+
+      // Update Live Scope Label
+      document.getElementById('liveSelectedOfficeLabel').innerHTML = `🏢 <span style="color:var(--primary); font-weight:800;">${office.office_name}</span> <span class="role-tag sub-admin">${office.office_code}</span> — Live Data`;
+
+      // Update 8 metric cards to this office's live stats
+      document.getElementById('lblCard1').textContent = 'Office Type / Role';
+      document.getElementById('iconCard1').innerHTML = '<i class="fas fa-landmark"></i>';
+      document.getElementById('cardTotalOffices').innerHTML = `<span style="font-size:1.15rem; font-weight:800;">${office.office_type || 'Regional Branch'}</span>`;
+
+      document.getElementById('lblCard2').textContent = 'Branch Status';
+      document.getElementById('iconCard2').innerHTML = '<i class="fas fa-circle-dot"></i>';
+      document.getElementById('cardActiveOffices').innerHTML = `<span class="status-badge ${office.status === 'Active' ? 'active' : 'inactive'}">${office.status}</span>`;
+
+      document.getElementById('lblCard3').textContent = 'Branch Staff & Admins';
+      document.getElementById('iconCard3').innerHTML = '<i class="fas fa-user-tie"></i>';
+      document.getElementById('cardTotalAdmins').textContent = metrics.staff || 1;
+
+      document.getElementById('lblCard4').textContent = 'Branch Parcels';
+      document.getElementById('iconCard4').innerHTML = '<i class="fas fa-boxes-packing"></i>';
+      document.getElementById('cardTotalParcels').textContent = metrics.totalParcels || 0;
+
+      document.getElementById('lblCard5').textContent = "Today's Parcels";
+      document.getElementById('iconCard5').innerHTML = '<i class="fas fa-calendar-day"></i>';
+      document.getElementById('cardTodayParcels').textContent = metrics.todayParcels || 0;
+
+      document.getElementById('lblCard6').textContent = 'Pending Consignments';
+      document.getElementById('iconCard6').innerHTML = '<i class="fas fa-hourglass-half"></i>';
+      document.getElementById('cardPendingParcels').textContent = metrics.pending || 0;
+
+      document.getElementById('lblCard7').textContent = 'Delivered Parcels';
+      document.getElementById('iconCard7').innerHTML = '<i class="fas fa-truck-ramp-box"></i>';
+      document.getElementById('cardDeliveredParcels').textContent = metrics.delivered || 0;
+
+      document.getElementById('lblCard8').textContent = 'Branch Revenue';
+      document.getElementById('iconCard8').innerHTML = '<i class="fas fa-indian-rupee-sign"></i>';
+      document.getElementById('cardTotalCustomers').innerHTML = `<span style="color:#059669; font-size:1.45rem;">₹${(metrics.revenue || 0).toLocaleString('en-IN')}</span>`;
+
+      // Show Selected Office Live Panel
+      document.getElementById('selectedOfficeLivePanel').style.display = 'block';
+      document.getElementById('liveOfficeCardTitle').innerHTML = `<i class="fas fa-building" style="color:var(--primary);"></i> ${office.office_name} (${office.office_code}) Live Control`;
+      document.getElementById('liveOfficeCardSubtitle').textContent = `Location: ${office.city}, ${office.state || 'Gujarat'} • Corridor: Rajkot – Surat Transport Service`;
+
+      document.getElementById('liveOfficePillAddress').textContent = office.address || '-';
+      document.getElementById('liveOfficePillPhone').textContent = office.phone || '-';
+      document.getElementById('liveOfficePillManager').textContent = office.manager || 'Branch Manager';
+      document.getElementById('liveOfficePillRevenue').textContent = `₹${(metrics.revenue || 0).toLocaleString('en-IN')}`;
+
+      // Render Live Bills for this office
+      const tb = document.getElementById('liveOfficeBillsTableBody');
+      if (!recentBills || recentBills.length === 0) {
+        tb.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px;">No consignments recorded for this branch office yet.</td></tr>';
+      } else {
+        tb.innerHTML = recentBills.slice(0, 10).map(b => `
+          <tr>
+            <td><strong>#${b.bill_no || b.id}</strong></td>
+            <td>${b.date || '-'}</td>
+            <td><i class="fas fa-bus"></i> ${b.bus_no || '-'}<br><span style="font-size:0.75rem; color:var(--text-muted);">${b.driver_name || '-'}</span></td>
+            <td>${b.moklnar_name || '-'}<br><span style="font-size:0.75rem; color:var(--text-muted);">${b.moklnar_mobile || ''}</span></td>
+            <td>${b.lenar_name || '-'}<br><span style="font-size:0.75rem; color:var(--text-muted);">${b.lenar_mobile || ''}</span></td>
+            <td><strong>₹${(b.total || 0).toLocaleString('en-IN')}</strong></td>
+            <td><span style="color:#059669;">J: ₹${b.jama || 0}</span> / <span style="color:#dc2626;">B: ₹${b.baki || 0}</span></td>
+            <td><span class="status-badge ${(b.baki || 0) === 0 ? 'delivered' : 'pending'}">${(b.baki || 0) === 0 ? 'Paid / Done' : 'Pending Baki'}</span></td>
+          </tr>
+        `).join('');
+      }
+
+      showToast(`Switched Live View to ${office.office_name}`);
+    }
+
+    function resetLiveOfficeFilter() {
+      document.getElementById('mainDashboardOfficeFilter').value = 'ALL';
+      renderGlobalDashboardView();
+      showToast('Switched to Global Systemwide View');
+    }
+
+    function openLiveOfficeApp(officeId, officeName, officeCode) {
+      localStorage.setItem('veronic_active_office_id', officeId);
+      window.location.href = `../index.html?office_id=${officeId}&office_code=${encodeURIComponent(officeCode || '')}&from_admin=1`;
+    }
+
+    function openCurrentlyFilteredOffice() {
+      if (currentLiveFilteredOfficeId && currentLiveFilteredOfficeId !== 'ALL') {
+        const off = (globalStats?.offices || []).find(o => o.id == currentLiveFilteredOfficeId);
+        openLiveOfficeApp(currentLiveFilteredOfficeId, off?.office_name || 'Office', off?.office_code || 'OFF');
+      }
+    }
+
+    function renderDashboardOfficesTable(offices) {
+      const tbody = document.getElementById('dashboardOfficesTableBody');
+      if (!offices || offices.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:20px;">No offices registered yet.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = offices.map(o => `
+        <tr>
+          <td><strong>${o.office_name}</strong></td>
+          <td><span class="role-tag sub-admin">${o.office_code}</span></td>
+          <td><i class="fas fa-location-dot" style="color:var(--primary);"></i> ${o.city || '-'}</td>
+          <td>${o.manager || 'Assigned Admin'}</td>
+          <td><strong>${o.total_parcels || 0}</strong> <span style="font-size:0.75rem; color:var(--text-muted);">pkgs</span></td>
+          <td><span class="status-badge ${o.status === 'Active' ? 'active' : 'inactive'}">${o.status}</span></td>
+          <td style="font-size:0.78rem; color:var(--text-muted);">${(o.created_at || '').slice(0, 10) || 'Active'}</td>
+          <td>
+            <div style="display: flex; gap: 6px;">
+              <button class="btn-secondary btn-sm" onclick="handleLiveOfficeFilterChange(${o.id})" title="View Live on Dashboard">
+                <i class="fas fa-eye" style="color:var(--primary);"></i> Live View
+              </button>
+              <button class="btn-open-office" onclick="openLiveOfficeApp(${o.id}, '${o.office_name.replace(/'/g, "\\'")}', '${o.office_code}')" title="Open Live Office Dashboard">
+                <i class="fas fa-building-circle-arrow-right"></i> Open Office
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function filterDashboardOffices() {
+      const query = document.getElementById('dashboardOfficeSearch').value.toLowerCase();
+      if (!globalStats || !globalStats.offices) return;
+      const filtered = globalStats.offices.filter(o =>
+        (o.office_name || '').toLowerCase().includes(query) ||
+        (o.office_code || '').toLowerCase().includes(query) ||
+        (o.city || '').toLowerCase().includes(query) ||
+        (o.manager || '').toLowerCase().includes(query)
+      );
+      renderDashboardOfficesTable(filtered);
+    }
+
+    // ==============================================
+    // 2. ALL OFFICES MANAGEMENT VIEW
+    // ==============================================
+    async function loadAllOffices() {
+      const res = await apiFetch('/offices');
+      if (!res || !res.success) return;
+      renderAllOfficesTable(res.data);
+    }
+
+    function renderAllOfficesTable(offices) {
+      const tbody = document.getElementById('allOfficesTableBody');
+      if (!offices || offices.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">No offices found.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = offices.map(o => `
+        <tr>
+          <td><strong>${o.office_name}</strong><br><span style="font-size:0.75rem; color:var(--text-muted);">${o.address || ''}</span></td>
+          <td><span class="role-tag sub-admin">${o.office_code}</span></td>
+          <td>${o.city || '-'}, ${o.state || 'Gujarat'}</td>
+          <td>${o.manager || 'Branch Manager'}</td>
+          <td><span style="font-size:0.8rem;"><i class="fas fa-phone"></i> ${o.phone || '-'}<br><i class="fas fa-envelope"></i> ${o.email || '-'}</span></td>
+          <td><strong>${o.total_parcels || 0}</strong></td>
+          <td><span class="status-badge ${o.status === 'Active' ? 'active' : 'inactive'}">${o.status}</span></td>
+          <td>
+            <button class="btn-open-office" onclick="openLiveOfficeApp(${o.id}, '${o.office_name.replace(/'/g, "\\'")}', '${o.office_code}')">
+              <i class="fas fa-arrow-up-right-from-square"></i> Open Office
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // ==============================================
+    // 3. STEP-BY-STEP ADD OFFICE + ADMIN WIZARD
+    // ==============================================
+    function autoSuggestOfficeCode() {
+      const name = document.getElementById('newOfficeName').value.trim();
+      if (!name) return;
+      const words = name.split(/\s+/);
+      let acronym = words.map(w => w.charAt(0).toUpperCase()).join('');
+      if (acronym.length < 3 && words[0]) {
+        acronym = words[0].substring(0, 3).toUpperCase();
+      }
+      const codeInput = document.getElementById('newOfficeCode');
+      if (!codeInput.dataset.userEdited) {
+        codeInput.value = `OFF-${acronym}-001`;
+      }
+    }
+
+    function generateRandomOfficeCode() {
+      const rand = Math.floor(100 + Math.random() * 900);
+      document.getElementById('newOfficeCode').value = `OFF-GEN-${rand}`;
+    }
+
+    async function handleCreateOfficeSubmit(e) {
+      e.preventDefault();
+      const office_name = document.getElementById('newOfficeName').value.trim();
+      const office_code = document.getElementById('newOfficeCode').value.trim();
+      const office_type = document.getElementById('newOfficeType').value;
+      const city = document.getElementById('newOfficeCity').value.trim();
+      const state = document.getElementById('newOfficeState').value.trim();
+      const address = document.getElementById('newOfficeAddress').value.trim();
+      const pincode = document.getElementById('newOfficePincode').value.trim();
+      const phone = document.getElementById('newOfficePhone').value.trim();
+      const email = document.getElementById('newOfficeEmail').value.trim();
+      const manager = document.getElementById('newOfficeManager').value.trim();
+      const opening_time = document.getElementById('newOfficeOpeningTime').value.trim();
+      const closing_time = document.getElementById('newOfficeClosingTime').value.trim();
+      const status = document.getElementById('newOfficeStatus').value;
+
+      const btn = document.getElementById('btnSubmitOfficeStep1');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Office...';
+
+      const payload = { office_name, office_code, office_type, city, state, address, pincode, phone, email, manager, opening_time, closing_time, status };
+      const res = await apiFetch('/offices', { method: 'POST', body: JSON.stringify(payload) });
+
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-arrow-right"></i> Create Office & Continue';
+
+      if (res && res.success) {
+        createdOfficeData = { id: res.data.id, ...payload };
+        showToast(`Office "${office_name}" created successfully!`);
+        transitionToStep2(createdOfficeData);
+      } else {
+        showToast(res ? res.error : 'Failed to create office', 'error');
+      }
+    }
+
+    function transitionToStep2(office) {
+      // Stepper UI
+      document.getElementById('stepNode1').className = 'wizard-step-node completed';
+      document.getElementById('stepNode2').className = 'wizard-step-node active';
+      document.getElementById('stepNode3').className = 'wizard-step-node';
+
+      document.getElementById('wizardStep1Card').style.display = 'none';
+      document.getElementById('wizardStep2Card').style.display = 'block';
+      document.getElementById('wizardStep3Card').style.display = 'none';
+
+      // Pre-fill locked office
+      document.getElementById('step2SuccessOfficeTitle').textContent = `Office Created: ${office.office_name}`;
+      document.getElementById('step2SuccessOfficeSub').textContent = `${office.office_name} (${office.office_code}) • ${office.city} is saved. Now configure the Office Admin credentials.`;
+      document.getElementById('step2OfficeDisplay').value = `${office.office_name} (${office.office_code})`;
+      document.getElementById('step2OfficeId').value = office.id;
+
+      // Auto-generate credentials option
+      generateCredentialsForStep2();
+    }
+
+    function generateCredentialsForStep2() {
+      const office = createdOfficeData || {};
+      const cityName = (office.city || 'office').toLowerCase().replace(/[^a-z0-9]/g, '');
+      const randNum = Math.floor(100 + Math.random() * 900);
+      
+      const suggestedUsername = `${cityName}_admin`;
+      const charset = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789@#$';
+      let suggestedPassword = '';
+      for (let i = 0; i < 10; i++) {
+        suggestedPassword += charset.charAt(Math.floor(Math.random() * charset.length));
+      }
+
+      document.getElementById('newAdminName').value = `${office.city || 'Branch'} Office Admin`;
+      document.getElementById('newAdminUsername').value = suggestedUsername;
+      document.getElementById('newAdminEmail').value = `${suggestedUsername}@veronic.com`;
+      document.getElementById('newAdminPassword').value = suggestedPassword;
+      document.getElementById('newAdminConfirmPassword').value = suggestedPassword;
+
+      showToast('Generated smart username & strong password!');
+    }
+
+    async function validateUsernameUniqueness(username) {
+      if (!username) return;
+      const res = await apiFetch(`/check-username?username=${encodeURIComponent(username)}`);
+      const hint = document.getElementById('usernameStatusHint');
+      if (res && res.available) {
+        hint.style.color = '#059669';
+        hint.innerHTML = '<i class="fas fa-check-circle"></i> Username is available';
+      } else {
+        hint.style.color = '#dc2626';
+        hint.innerHTML = '<i class="fas fa-times-circle"></i> Username already in use';
+      }
+    }
+
+    async function handleCreateAdminSubmit(e) {
+      e.preventDefault();
+      const office_id = document.getElementById('step2OfficeId').value;
+      const name = document.getElementById('newAdminName').value.trim();
+      const username = document.getElementById('newAdminUsername').value.trim();
+      const email = document.getElementById('newAdminEmail').value.trim();
+      const phone = document.getElementById('newAdminPhone').value.trim();
+      const password = document.getElementById('newAdminPassword').value;
+      const confirm = document.getElementById('newAdminConfirmPassword').value;
+      const role = document.getElementById('newAdminRole').value;
+      const status = document.getElementById('newAdminStatus').value;
+
+      if (password !== confirm) {
+        showToast('Passwords do not match. Please verify.', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('btnSubmitAdminStep2');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Admin...';
+
+      const payload = {
+        name, username, email, phone, password, role, status, office_id,
+        permissions: ['dashboard', 'parcels', 'customers', 'drivers', 'delivery', 'billing', 'reports']
+      };
+
+      const res = await apiFetch('/admins', { method: 'POST', body: JSON.stringify(payload) });
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-check"></i> Create Admin & Generate Login →';
+
+      if (res && res.success) {
+        createdAdminData = { id: res.data.id, ...payload };
+        showToast('Admin account created successfully!');
+        transitionToStep3Confirmation();
+      } else {
+        showToast(res ? res.error : 'Failed to create admin', 'error');
+      }
+    }
+
+    function skipAdminCreation() {
+      showToast('Skipped admin creation. You can add an admin later.');
+      resetWizardAndGoOffices();
+    }
+
+    function transitionToStep3Confirmation() {
+      document.getElementById('stepNode1').className = 'wizard-step-node completed';
+      document.getElementById('stepNode2').className = 'wizard-step-node completed';
+      document.getElementById('stepNode3').className = 'wizard-step-node active';
+
+      document.getElementById('wizardStep1Card').style.display = 'none';
+      document.getElementById('wizardStep2Card').style.display = 'none';
+      document.getElementById('wizardStep3Card').style.display = 'block';
+
+      // Fill Confirmation Details
+      document.getElementById('confDisplayUsername').textContent = createdAdminData.username;
+      document.getElementById('confDisplayPassword').textContent = createdAdminData.password;
+
+      document.getElementById('confOfficeName').textContent = createdOfficeData.office_name;
+      document.getElementById('confOfficeCode').textContent = createdOfficeData.office_code;
+      document.getElementById('confOfficeCity').textContent = `${createdOfficeData.city}, ${createdOfficeData.state || 'Gujarat'}`;
+      document.getElementById('confOfficePhone').textContent = createdOfficeData.phone || '-';
+
+      document.getElementById('confAdminName').textContent = createdAdminData.name;
+      document.getElementById('confAdminEmail').textContent = createdAdminData.email;
+      document.getElementById('confAdminRole').textContent = createdAdminData.role === 'sub_admin' ? 'Office Admin' : createdAdminData.role;
+
+      document.getElementById('btnConfOpenOffice').onclick = () => {
+        openOfficeDrilldown(createdOfficeData.id, createdOfficeData.office_name, createdOfficeData.office_code);
+      };
+    }
+
+    function resetWizardAndGoOffices() {
+      document.getElementById('createOfficeForm').reset();
+      document.getElementById('createAdminForm').reset();
+      document.getElementById('stepNode1').className = 'wizard-step-node active';
+      document.getElementById('stepNode2').className = 'wizard-step-node';
+      document.getElementById('stepNode3').className = 'wizard-step-node';
+      document.getElementById('wizardStep1Card').style.display = 'block';
+      document.getElementById('wizardStep2Card').style.display = 'none';
+      document.getElementById('wizardStep3Card').style.display = 'none';
+      switchView('offices');
+    }
+
+    // ==============================================
+    // 4. ADMIN MANAGEMENT & STANDALONE CREATION
+    // ==============================================
+    async function loadAdmins() {
+      const res = await apiFetch('/admins');
+      if (!res || !res.success) return;
+      renderAdminsTable(res.data);
+    }
+
+    function renderAdminsTable(admins) {
+      const tbody = document.getElementById('adminsTableBody');
+      if (!admins || admins.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;">No admin accounts found.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = admins.map(a => {
+        const pwd = a.password || '••••••••';
+        const rawPwd = (a.password || '').replace(/'/g, "\\'");
+        return `
+        <tr>
+          <td><strong>${a.name}</strong></td>
+          <td><span style="font-family:monospace; font-weight:700;">${a.username}</span></td>
+          <td>${a.email}</td>
+          <td>
+            <div style="display:inline-flex; align-items:center; gap:6px; background:var(--bg-card); padding:3px 8px; border-radius:6px; border:1px solid var(--border-color);">
+              <span id="pwd-display-${a.id}" style="font-family:monospace; font-size:0.85rem; letter-spacing:1px; min-width:70px;">••••••••</span>
+              <button type="button" class="btn-secondary btn-sm" style="padding:2px 6px; font-size:0.75rem; border:none; background:transparent;" onclick="togglePasswordVisibility(${a.id}, '${rawPwd}')" title="Show / Hide Password">
+                <i id="pwd-icon-${a.id}" class="fas fa-eye"></i>
+              </button>
+              <button type="button" class="btn-secondary btn-sm" style="padding:2px 6px; font-size:0.75rem; border:none; background:transparent;" onclick="copyPasswordToClipboard('${rawPwd}')" title="Copy Password">
+                <i class="fas fa-copy"></i>
+              </button>
+            </div>
+          </td>
+          <td>${a.office_name ? `${a.office_name} <span class="role-tag sub-admin">${a.office_code}</span>` : '<span class="role-tag main-admin">GLOBAL (ALL)</span>'}</td>
+          <td><span class="role-tag ${a.role === 'main_admin' ? 'main-admin' : 'sub-admin'}">${a.role}</span></td>
+          <td><span class="status-badge ${a.status === 'Active' ? 'active' : 'inactive'}">${a.status}</span></td>
+          <td style="font-size:0.75rem; color:var(--text-muted);">${a.last_login || 'Never'}</td>
+          <td>
+            <div style="display:flex; gap:6px;">
+              <button class="btn-secondary btn-sm" onclick="promptResetPassword(${a.id}, '${a.name.replace(/'/g, "\\'")}')" title="Reset / Change Password"><i class="fas fa-key"></i></button>
+              ${a.role !== 'main_admin' ? `
+                <button class="btn-secondary btn-sm" onclick="toggleAdminStatus(${a.id}, '${a.status === 'Active' ? 'Inactive' : 'Active'}')" title="Toggle Status">
+                  <i class="fas fa-${a.status === 'Active' ? 'user-slash' : 'user-check'}"></i>
+                </button>
+                <button class="btn-secondary btn-sm" onclick="deleteAdminUser(${a.id})" style="color:#dc2626;" title="Delete"><i class="fas fa-trash"></i></button>
+              ` : ''}
+            </div>
+          </td>
+        </tr>
+      `;
+      }).join('');
+    }
+
+    function togglePasswordVisibility(id, rawPassword) {
+      const display = document.getElementById(`pwd-display-${id}`);
+      const icon = document.getElementById(`pwd-icon-${id}`);
+      if (!display || !icon) return;
+      if (display.textContent === '••••••••') {
+        display.textContent = rawPassword || 'N/A';
+        display.style.letterSpacing = 'normal';
+        icon.className = 'fas fa-eye-slash';
+      } else {
+        display.textContent = '••••••••';
+        display.style.letterSpacing = '1px';
+        icon.className = 'fas fa-eye';
+      }
+    }
+
+    function copyPasswordToClipboard(rawPassword) {
+      if (!rawPassword) {
+        showToast('No password set', 'error');
+        return;
+      }
+      navigator.clipboard.writeText(rawPassword).then(() => {
+        showToast('Password copied to clipboard!');
+      }).catch(() => {
+        showToast('Password: ' + rawPassword);
+      });
+    }
+
+    async function loadStandaloneOfficesDropdown() {
+      const res = await apiFetch('/offices');
+      if (!res || !res.success) return;
+      const select = document.getElementById('standaloneAdminOfficeSelect');
+      select.innerHTML = '<option value="">-- Choose Branch Office --</option>' +
+        res.data.map(o => `<option value="${o.id}">${o.office_name} (${o.office_code}) - ${o.city}</option>`).join('');
+    }
+
+    function generateCredentialsForStandaloneAdmin() {
+      const select = document.getElementById('standaloneAdminOfficeSelect');
+      const officeText = select.options[select.selectedIndex]?.text || 'branch';
+      const cityPart = officeText.split(' - ')[1] || 'office';
+      const cleanCity = cityPart.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+      const username = `${cleanCity}_admin`;
+      const charset = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789@#$';
+      let pwd = '';
+      for (let i = 0; i < 10; i++) pwd += charset.charAt(Math.floor(Math.random() * charset.length));
+
+      document.getElementById('saAdminUsername').value = username;
+      document.getElementById('saAdminEmail').value = `${username}@veronic.com`;
+      document.getElementById('saAdminPassword').value = pwd;
+      document.getElementById('saAdminConfirmPassword').value = pwd;
+      showToast('Generated credentials!');
+    }
+
+    async function handleStandaloneAdminSubmit(e) {
+      e.preventDefault();
+      const office_id = document.getElementById('standaloneAdminOfficeSelect').value;
+      const name = document.getElementById('saAdminName').value.trim();
+      const username = document.getElementById('saAdminUsername').value.trim();
+      const email = document.getElementById('saAdminEmail').value.trim();
+      const phone = document.getElementById('saAdminPhone').value.trim();
+      const password = document.getElementById('saAdminPassword').value;
+      const confirm = document.getElementById('saAdminConfirmPassword').value;
+      const role = document.getElementById('saAdminRole').value;
+      const status = document.getElementById('saAdminStatus').value;
+
+      if (password !== confirm) {
+        showToast('Passwords do not match', 'error');
+        return;
+      }
+
+      const res = await apiFetch('/admins', {
+        method: 'POST',
+        body: JSON.stringify({ name, username, email, phone, password, role, status, office_id, permissions: ['dashboard', 'parcels', 'customers', 'drivers', 'delivery', 'billing', 'reports'] })
+      });
+
+      if (res && res.success) {
+        showToast('Admin created successfully!');
+        document.getElementById('standaloneCreateAdminForm').reset();
+        switchView('admins');
+      } else {
+        showToast(res ? res.error : 'Failed to create admin', 'error');
+      }
+    }
+
+    function promptResetPassword(id, name) {
+      document.getElementById('resetAdminId').value = id;
+      document.getElementById('resetAdminNameDisplay').value = name;
+      document.getElementById('resetAdminNewPassword').value = '';
+      openModal('resetPasswordModal');
+    }
+
+    async function submitResetPassword() {
+      const id = document.getElementById('resetAdminId').value;
+      const password = document.getElementById('resetAdminNewPassword').value;
+      if (!password || password.length < 3) {
+        showToast('Password must be at least 3 characters', 'error');
+        return;
+      }
+      const res = await apiFetch(`/admins/${id}/reset-password`, { method: 'PUT', body: JSON.stringify({ password }) });
+      if (res && res.success) {
+        showToast('Password reset successfully!');
+        closeModal('resetPasswordModal');
+        loadAdmins();
+      } else {
+        showToast(res ? res.error : 'Failed to reset password', 'error');
+      }
+    }
+
+    async function toggleAdminStatus(id, newStatus) {
+      const res = await apiFetch(`/admins/${id}/status`, { method: 'PUT', body: JSON.stringify({ status: newStatus }) });
+      if (res && res.success) {
+        showToast(`Status updated to ${newStatus}`);
+        loadAdmins();
+      }
+    }
+
+    async function deleteAdminUser(id) {
+      if (!confirm('Are you sure you want to delete this administrator?')) return;
+      const res = await apiFetch(`/admins/${id}`, { method: 'DELETE' });
+      if (res && res.success) {
+        showToast('Admin deleted');
+        loadAdmins();
+      }
+    }
+
+    // ==============================================
+    // 5. SELECTED OFFICE DRILLDOWN DASHBOARD
+    // ==============================================
+    async function openOfficeDrilldown(officeId, officeName, officeCode) {
+      currentDrilldownOfficeId = officeId;
+      switchView('office-drilldown');
+
+      document.getElementById('drilldownOfficeTitle').innerHTML = `${officeName} <span class="role-tag sub-admin">${officeCode}</span>`;
+      document.getElementById('drilldownOfficeSubtitle').textContent = `Full operational control for ${officeName} (Corridor: Rajkot – Surat)`;
+
+      const res = await apiFetch(`/offices/${officeId}/dashboard`);
+      if (!res || !res.success) return;
+
+      const { metrics, recentBills, staff, drivers } = res.data;
+
+      document.getElementById('drillMetricParcels').textContent = metrics.totalParcels || 0;
+      document.getElementById('drillMetricToday').textContent = metrics.todayParcels || 0;
+      document.getElementById('drillMetricPending').textContent = metrics.pending || 0;
+      document.getElementById('drillMetricInTransit').textContent = metrics.inTransit || 0;
+      document.getElementById('drillMetricDelivered').textContent = metrics.delivered || 0;
+      document.getElementById('drillMetricCustomers').textContent = metrics.customers || 0;
+      document.getElementById('drillMetricDrivers').textContent = metrics.drivers || 0;
+      document.getElementById('drillMetricRevenue').textContent = `₹${(metrics.revenue || 0).toLocaleString('en-IN')}`;
+
+      // Render Bills
+      const bBody = document.getElementById('drillBillsTableBody');
+      if (!recentBills || recentBills.length === 0) {
+        bBody.innerHTML = '<tr><td colspan="8" style="text-align:center;">No parcels recorded for this office yet.</td></tr>';
+      } else {
+        bBody.innerHTML = recentBills.map(b => `
+          <tr>
+            <td><strong>#${b.bill_no || b.id}</strong></td>
+            <td>${b.date || '-'}</td>
+            <td><i class="fas fa-bus"></i> ${b.bus_no || '-'}<br><span style="font-size:0.75rem; color:var(--text-muted);">${b.driver_name || '-'}</span></td>
+            <td>${b.moklnar_name || '-'}<br><span style="font-size:0.75rem; color:var(--text-muted);">${b.moklnar_mobile || ''}</span></td>
+            <td>${b.lenar_name || '-'}<br><span style="font-size:0.75rem; color:var(--text-muted);">${b.lenar_mobile || ''}</span></td>
+            <td><strong>₹${(b.total || 0).toLocaleString('en-IN')}</strong></td>
+            <td><span style="color:#059669;">J: ₹${b.jama || 0}</span> / <span style="color:#dc2626;">B: ₹${b.baki || 0}</span></td>
+            <td><span class="status-badge ${(b.baki || 0) === 0 ? 'delivered' : 'pending'}">${(b.baki || 0) === 0 ? 'Paid / Done' : 'Pending Baki'}</span></td>
+          </tr>
+        `).join('');
+      }
+
+      // Render Drivers
+      const dBody = document.getElementById('drillDriversTableBody');
+      dBody.innerHTML = (drivers || []).map(d => `
+        <tr>
+          <td><strong>${d.name}</strong></td>
+          <td>${d.mobile}</td>
+          <td>${d.license_no || 'Standard Commercial'}</td>
+          <td><span class="status-badge active">${d.status || 'Active'}</span></td>
+        </tr>
+      `).join('');
+
+      // Render Staff
+      const sBody = document.getElementById('drillStaffTableBody');
+      sBody.innerHTML = (staff || []).map(s => `
+        <tr>
+          <td><strong>${s.name}</strong></td>
+          <td><code>${s.username}</code></td>
+          <td>${s.email}</td>
+          <td><span class="role-tag sub-admin">${s.role}</span></td>
+          <td><span class="status-badge ${s.status === 'Active' ? 'active' : 'inactive'}">${s.status}</span></td>
+          <td>${s.last_login || 'Never'}</td>
+        </tr>
+      `).join('');
+    }
+
+    function returnToAllOffices() {
+      switchView('offices');
+    }
+
+    function reloadCurrentDrilldown() {
+      if (currentDrilldownOfficeId) {
+        openOfficeDrilldown(currentDrilldownOfficeId, '', '');
+      }
+    }
+
+    // ==============================================
+    // 6. USERS & MEMBERS MANAGEMENT, PARCELS, REPORTS, LOGS
+    // ==============================================
+    async function loadUsers() {
+      const res = await apiFetch('/users');
+      if (!res || !res.success) return;
+      const tbody = document.getElementById('usersTableBody');
+      if (!res.data || res.data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;">No users/members registered yet.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = res.data.map(u => {
+        const rawPwd = (u.password || '').replace(/'/g, "\\'");
+        return `
+        <tr>
+          <td><strong>#${u.id}</strong></td>
+          <td><strong>${u.name}</strong></td>
+          <td><span style="font-family:monospace; font-weight:600;">${u.email}</span></td>
+          <td>
+            <div style="display:inline-flex; align-items:center; gap:6px; background:var(--bg-card); padding:3px 8px; border-radius:6px; border:1px solid var(--border-color);">
+              <span id="user-pwd-display-${u.id}" style="font-family:monospace; font-size:0.85rem; letter-spacing:1px; min-width:70px;">••••••••</span>
+              <button type="button" class="btn-secondary btn-sm" style="padding:2px 6px; font-size:0.75rem; border:none; background:transparent;" onclick="toggleUserPasswordVisibility(${u.id}, '${rawPwd}')" title="Show / Hide Password">
+                <i id="user-pwd-icon-${u.id}" class="fas fa-eye"></i>
+              </button>
+              <button type="button" class="btn-secondary btn-sm" style="padding:2px 6px; font-size:0.75rem; border:none; background:transparent;" onclick="copyUserPasswordToClipboard('${rawPwd}')" title="Copy Password">
+                <i class="fas fa-copy"></i>
+              </button>
+            </div>
+          </td>
+          <td>
+            <strong style="color:var(--text-dark);">${u.office_name || 'Global (All Offices)'}</strong>
+          </td>
+          <td>
+            <div style="display:inline-flex; align-items:center; gap:6px; font-weight:600; color:#084c50;">
+              <i class="fas fa-location-dot" style="color:var(--primary);"></i>
+              <span>${u.city || 'Rajkot'}${u.state ? `, ${u.state}` : ''}</span>
+              <span class="role-tag sub-admin" style="font-size:0.68rem; padding:1px 6px;">${u.office_code || 'OFF-001'}</span>
+            </div>
+          </td>
+          <td><span class="role-tag ${u.role === 'manager' ? 'main-admin' : 'sub-admin'}">${u.role || 'member'}</span></td>
+          <td style="font-size:0.78rem; color:var(--text-muted);">${(u.created_at || '').slice(0, 10) || '-'}</td>
+          <td><span class="status-badge ${u.status === 'Active' ? 'active' : 'inactive'}">${u.status || 'Active'}</span></td>
+          <td>
+            <div style="display:flex; gap:6px;">
+              <button class="btn-secondary btn-sm" onclick="promptResetUserPassword(${u.id}, '${u.name.replace(/'/g, "\\'")}')" title="Reset Password"><i class="fas fa-key"></i></button>
+              <button class="btn-secondary btn-sm" onclick="toggleUserStatus(${u.id}, '${u.status === 'Active' ? 'Inactive' : 'Active'}')" title="Toggle Status">
+                <i class="fas fa-${u.status === 'Active' ? 'user-slash' : 'user-check'}"></i>
+              </button>
+              <button class="btn-secondary btn-sm" onclick="deleteUserMember(${u.id})" style="color:#dc2626;" title="Delete"><i class="fas fa-trash"></i></button>
+            </div>
+          </td>
+        </tr>
+      `;
+      }).join('');
+    }
+
+    function toggleUserPasswordVisibility(id, rawPassword) {
+      const display = document.getElementById(`user-pwd-display-${id}`);
+      const icon = document.getElementById(`user-pwd-icon-${id}`);
+      if (!display || !icon) return;
+      if (display.textContent === '••••••••') {
+        display.textContent = rawPassword || 'N/A';
+        display.style.letterSpacing = 'normal';
+        icon.className = 'fas fa-eye-slash';
+      } else {
+        display.textContent = '••••••••';
+        display.style.letterSpacing = '1px';
+        icon.className = 'fas fa-eye';
+      }
+    }
+
+    function copyUserPasswordToClipboard(rawPassword) {
+      if (!rawPassword) {
+        showToast('No password set', 'error');
+        return;
+      }
+      navigator.clipboard.writeText(rawPassword).then(() => {
+        showToast('Password copied to clipboard!');
+      }).catch(() => {
+        showToast('Password: ' + rawPassword);
+      });
+    }
+
+    async function openAddMemberModal() {
+      await loadOfficesForMemberModal();
+      document.getElementById('createMemberForm').reset();
+      openModal('addMemberModal');
+    }
+
+    async function loadOfficesForMemberModal() {
+      const res = await apiFetch('/offices');
+      if (!res || !res.success) return;
+      const select = document.getElementById('newMemberOfficeSelect');
+      select.innerHTML = '<option value="">-- Select Branch Office --</option>' +
+        res.data.map(o => `<option value="${o.id}">${o.office_name} (${o.office_code}) - ${o.city}</option>`).join('');
+    }
+
+    function generateCredentialsForMember() {
+      const name = document.getElementById('newMemberName').value.trim();
+      const select = document.getElementById('newMemberOfficeSelect');
+      const officeText = select.options[select.selectedIndex]?.text || '';
+      const city = officeText.split(' - ')[1] || 'office';
+      const cleanCity = city.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+      const cleanName = name ? name.toLowerCase().split(' ')[0].replace(/[^a-z0-9]/g, '') : cleanCity;
+      if (!document.getElementById('newMemberEmail').value) {
+        document.getElementById('newMemberEmail').value = `${cleanName}_${cleanCity}@dropbook.com`;
+      }
+
+      const charset = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789@#$';
+      let pwd = '';
+      for (let i = 0; i < 10; i++) pwd += charset.charAt(Math.floor(Math.random() * charset.length));
+      document.getElementById('newMemberPassword').value = pwd;
+      showToast('Generated password!');
+    }
+
+    async function submitCreateMemberForm(e) {
+      e.preventDefault();
+      const name = document.getElementById('newMemberName').value.trim();
+      const email = document.getElementById('newMemberEmail').value.trim();
+      const office_id = document.getElementById('newMemberOfficeSelect').value;
+      const role = document.getElementById('newMemberRole').value;
+      const status = document.getElementById('newMemberStatus').value;
+      const password = document.getElementById('newMemberPassword').value.trim();
+
+      if (!office_id) {
+        showToast('Please select a branch office', 'error');
+        return;
+      }
+
+      const res = await apiFetch('/users', {
+        method: 'POST',
+        body: JSON.stringify({ name, email, office_id, role, status, password })
+      });
+
+      if (res && res.success) {
+        showToast('Member created successfully!');
+        closeModal('addMemberModal');
+        loadUsers();
+      } else {
+        showToast(res ? res.error : 'Failed to create member', 'error');
+      }
+    }
+
+    function promptResetUserPassword(id, name) {
+      document.getElementById('resetUserId').value = id;
+      document.getElementById('resetUserNameDisplay').value = name;
+      document.getElementById('resetUserNewPassword').value = '';
+      openModal('resetUserPasswordModal');
+    }
+
+    async function submitResetUserPassword() {
+      const id = document.getElementById('resetUserId').value;
+      const password = document.getElementById('resetUserNewPassword').value;
+      if (!password || password.length < 3) {
+        showToast('Password must be at least 3 characters', 'error');
+        return;
+      }
+      const res = await apiFetch(`/users/${id}/reset-password`, {
+        method: 'PUT',
+        body: JSON.stringify({ password })
+      });
+      if (res && res.success) {
+        showToast('Password reset successfully!');
+        closeModal('resetUserPasswordModal');
+        loadUsers();
+      } else {
+        showToast(res ? res.error : 'Failed to reset password', 'error');
+      }
+    }
+
+    async function toggleUserStatus(id, newStatus) {
+      const res = await apiFetch(`/users/${id}/status`, {
+        method: 'PUT',
+        body: JSON.stringify({ status: newStatus })
+      });
+      if (res && res.success) {
+        showToast(`Status updated to ${newStatus}`);
+        loadUsers();
+      } else {
+        showToast(res ? res.error : 'Failed to update status', 'error');
+      }
+    }
+
+    async function deleteUserMember(id) {
+      if (!confirm('Are you sure you want to delete this member account?')) return;
+      const res = await apiFetch(`/users/${id}`, { method: 'DELETE' });
+      if (res && res.success) {
+        showToast('Member deleted successfully');
+        loadUsers();
+      } else {
+        showToast(res ? res.error : 'Failed to delete member', 'error');
+      }
+    }
+
+    async function loadParcels() {
+      const res = await apiFetch('/parcels');
+      if (!res || !res.success) return;
+      document.getElementById('globalParcelsTableBody').innerHTML = res.data.map(p => `
+        <tr>
+          <td><strong>#${p.bill_no || p.id}</strong></td>
+          <td>${p.date || '-'}</td>
+          <td>${p.from_city || 'Rajkot'} → ${p.to_city || 'Surat'}</td>
+          <td>${p.moklnar_name || '-'}</td>
+          <td>${p.lenar_name || '-'}</td>
+          <td><strong>${p.qty || 1}</strong></td>
+          <td>₹${(p.total || 0).toLocaleString('en-IN')}</td>
+          <td><span class="status-badge ${(p.baki || 0) === 0 ? 'delivered' : 'pending'}">${(p.baki || 0) === 0 ? 'Paid' : `Baki: ₹${p.baki}`}</span></td>
+        </tr>
+      `).join('');
+    }
+
+    async function loadReports() {
+      const res = await apiFetch('/reports');
+      if (!res || !res.success) return;
+      const { monthlyStats } = res.data;
+      document.getElementById('reportsTableBody').innerHTML = (monthlyStats || []).map(m => `
+        <tr>
+          <td><strong>${m.month || 'Current'}</strong></td>
+          <td>${m.total_bills || 0} consignments</td>
+          <td><strong style="color:var(--primary);">₹${(m.revenue || 0).toLocaleString('en-IN')}</strong></td>
+        </tr>
+      `).join('');
+    }
+
+    async function loadActivityLogs() {
+      const res = await apiFetch('/activity-logs');
+      if (!res || !res.success) return;
+      document.getElementById('activityLogsTableBody').innerHTML = res.data.map(l => `
+        <tr>
+          <td style="font-size:0.75rem; color:var(--text-muted);">${l.created_at}</td>
+          <td><strong>${l.admin_name || 'System'}</strong></td>
+          <td><span class="role-tag main-admin">${l.action}</span></td>
+          <td>${l.details || ''}</td>
+          <td><code>${l.ip_address || '127.0.0.1'}</code></td>
+        </tr>
+      `).join('');
+    }
+
+    // Boot
+    window.addEventListener('DOMContentLoaded', initApp);
+  </script>
+
+  <!-- ADMIN MOBILE BOTTOM NAVIGATION BAR -->
+  <div class="admin-mobile-bottom-bar">
+    <button class="admin-bottom-item active" data-view="dashboard">
+      <i class="fas fa-chart-pie"></i>
+      <span>Dashboard</span>
+    </button>
+    <button class="admin-bottom-item" data-view="offices">
+      <i class="fas fa-building"></i>
+      <span>Offices</span>
+    </button>
+    <button class="admin-bottom-item admin-bottom-fab" data-view="add-office" title="Add Office">
+      <i class="fas fa-plus"></i>
+    </button>
+    <button class="admin-bottom-item" data-view="admins">
+      <i class="fas fa-user-shield"></i>
+      <span>Admins</span>
+    </button>
+    <button class="admin-bottom-item" data-view="parcels">
+      <i class="fas fa-boxes-packing"></i>
+      <span>Parcels</span>
+    </button>
+  </div>
+</body>
+</html>
